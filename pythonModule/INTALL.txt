@@ -1,5 +1,8 @@
-# eegSea
-Casque EEG - projet La mer est ton miroir
+﻿Bonjour,
+il y a deux trois trucs à faire pour faire fonctionner le script python AcquisitionEEGserveurUDP.py
+sur l'OS windows (pour linux aussi lorsque la ligne commence par *)
+
+Merci de le faire dans l'ordre ci-dessous :
 
 installer python27 (ça c'est déjà fait normalement !)
 

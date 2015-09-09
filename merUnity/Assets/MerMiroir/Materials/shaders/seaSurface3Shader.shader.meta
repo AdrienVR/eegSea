@@ -1,0 +1,7 @@
+fileFormatVersion: 2
+guid: f03f37381e2e9468cbfac4104b26d27d
+ShaderImporter:
+  defaultTextures:
+  - _WaveMap: {fileID: 2800000, guid: cc19c975b5a1a41b3a33b98471fbbbee, type: 3}
+  - _Cube: {fileID: 8900000, guid: c70545abebe54ef4fa7414f7413f2dee, type: 2}
+  userData: 

@@ -20,8 +20,8 @@ public class WindSound : MonoBehaviour {
 		}
 		if (av > moyMax)
 						moyMax = av;
-		audio.volume = (av/moyMax)*(av/moyMax);
-		audio.pitch = 0.85f+0.3f*audio.volume;
+		GetComponent<AudioSource>().volume = (av/moyMax)*(av/moyMax);
+		GetComponent<AudioSource>().pitch = 0.85f+0.3f*GetComponent<AudioSource>().volume;
 	} 
 }
 

@@ -10,7 +10,7 @@ public class moodSpecular : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		coeff = 0.5f;
-		light.intensity = (leftIntensity * coeff + rightIntensity * (1f-coeff));
+		GetComponent<Light>().intensity = (leftIntensity * coeff + rightIntensity * (1f-coeff));
 	}
 	
 	// Update is called once per frame
@@ -20,11 +20,11 @@ public class moodSpecular : MonoBehaviour {
 		float alpha = Mathf.Min(Time.deltaTime / halftime, 1f);
 		if (delta == 0) {
 			coeff=(1f-alpha)*coeff +alpha*0.5f;
-			light.intensity = (leftIntensity * coeff + rightIntensity * (1f-coeff));
+			GetComponent<Light>().intensity = (leftIntensity * coeff + rightIntensity * (1f-coeff));
 			return;
 		}
 		coeff = (1f-alpha)*coeff+alpha*(Client.maxGD - Client.valGaucheDroite) / delta;
-		light.intensity = (leftIntensity * coeff + rightIntensity * (1f-coeff));
+		GetComponent<Light>().intensity = (leftIntensity * coeff + rightIntensity * (1f-coeff));
 	
 	}
 }

@@ -162,7 +162,7 @@ public class PlusieurVagues : MonoBehaviour {
 //		perlinVagues = gameObject.GetComponentsInChildren<PerlinVague>();
 		Client.init(alphaRadius,alphaTHF); //Appeler init une seulf fois dans le programme	//Given param: alpha radius & alpha THF
 
-		Material targetMaterial = targetGameObject.renderer.material;
+		Material targetMaterial = targetGameObject.GetComponent<Renderer>().material;
 	    if (targetMaterial.HasProperty("_WavesAmount"))
 		{
 			targetMaterial.SetFloat("_WavesAmount",amount);
@@ -206,7 +206,7 @@ public class PlusieurVagues : MonoBehaviour {
 
 		Client.MAJmoyenneEcartType (Time.deltaTime,TMoyenneBasse,TMoyenneHaute,TMoyenneTheta,TMoyenneTHF,TEcartTypeBasse,TEcartTypeHaute,TEcartTypeTheta,TEcartTypeTHF);
 		
-		Material targetMaterial = targetGameObject.renderer.material;
+		Material targetMaterial = targetGameObject.GetComponent<Renderer>().material;
 		if (targetMaterial.HasProperty("_WavesAmount")) targetMaterial.SetFloat("_WavesAmount",amount);
 		if(targetMaterial.HasProperty("_windDir")) targetMaterial.SetFloat("_windDir",windDir*Mathf.Deg2Rad);
 

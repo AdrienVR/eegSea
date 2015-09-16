@@ -12,7 +12,7 @@ public class MoodLight : MonoBehaviour {
 		transform.eulerAngles = new Vector3(transform.eulerAngles.x, cam.transform.eulerAngles.y, transform.eulerAngles.z);
 		//transform.eulerAngles.Set(transform.eulerAngles.x, cam.transform.eulerAngles.y,transform.eulerAngles.z);
 		coeff = 0.5f;
-		light.color = (leftColor * coeff + rightColor * (1f-coeff))*cam.speed/cam.maxSpeed;
+		GetComponent<Light>().color = (leftColor * coeff + rightColor * (1f-coeff))*cam.speed/cam.maxSpeed;
 	}
 	
 	// Update is called once per frame
@@ -20,11 +20,11 @@ public class MoodLight : MonoBehaviour {
 		Client.moyenneGD ();
 		float delta = Client.maxGD - Client.minGD;
 		if (delta == 0) {
-			light.color = (leftColor * coeff + rightColor * (1f-coeff))*cam.speed/cam.maxSpeed;
+			GetComponent<Light>().color = (leftColor * coeff + rightColor * (1f-coeff))*cam.speed/cam.maxSpeed;
 			return;
 		}
 		float alpha = Mathf.Min(Time.deltaTime / halftime, 1f);
 		coeff = (1f-alpha)*coeff+alpha*(Client.maxGD - Client.valGaucheDroite) / delta;
-		light.color = (leftColor * coeff + rightColor * (1f-coeff))*Mathf.Sqrt (cam.speed/cam.maxSpeed);
+		GetComponent<Light>().color = (leftColor * coeff + rightColor * (1f-coeff))*Mathf.Sqrt (cam.speed/cam.maxSpeed);
 	}
 }

@@ -96,19 +96,19 @@ public class AdaptativeMeshSea : MonoBehaviour {
 			Debug.DrawLine (hautDroite, basDroite, Color.magenta);
 			Debug.DrawLine (basDroite, basGauche, Color.magenta);
 
-			if (renderer.material.HasProperty("_LeftBottom"))
+			if (GetComponent<Renderer>().material.HasProperty("_LeftBottom"))
 			{
-				renderer.material.SetVector("_LeftBottom",new Vector4(basGauche.x,basGauche.y,basGauche.z,1.0f));
+				GetComponent<Renderer>().material.SetVector("_LeftBottom",new Vector4(basGauche.x,basGauche.y,basGauche.z,1.0f));
 			}
-			if (renderer.material.HasProperty("_LeftRight"))
+			if (GetComponent<Renderer>().material.HasProperty("_LeftRight"))
 			{
 				Vector3 gaucheDroite = basDroite - basGauche;
-				renderer.material.SetVector("_LeftRight",new Vector4(gaucheDroite.x,gaucheDroite.y,gaucheDroite.z,0.0f));
+				GetComponent<Renderer>().material.SetVector("_LeftRight",new Vector4(gaucheDroite.x,gaucheDroite.y,gaucheDroite.z,0.0f));
 			}
-			if (renderer.material.HasProperty("_BottomTop"))
+			if (GetComponent<Renderer>().material.HasProperty("_BottomTop"))
 			{
 				Vector3 basHaut = hautGauche - basGauche;
-				renderer.material.SetVector("_BottomTop",new Vector4(basHaut.x,basHaut.y,basHaut.z,1.0f));
+				GetComponent<Renderer>().material.SetVector("_BottomTop",new Vector4(basHaut.x,basHaut.y,basHaut.z,1.0f));
 			}
 			/* Tout ceci se retrouve dans seaSurface2Shader
 			 * 
@@ -155,7 +155,7 @@ public class AdaptativeMeshSea : MonoBehaviour {
 			*/
 
 			//mesh.RecalculateBounds();  may not work because of the vertex shader
-			MeshFilter meshFilter = renderer.GetComponent<MeshFilter>();
+			MeshFilter meshFilter = GetComponent<Renderer>().GetComponent<MeshFilter>();
 			meshFilter.sharedMesh.bounds = new Bounds (
 				Camera.main.transform.position, 
 				Vector3.one * Camera.main.farClipPlane);

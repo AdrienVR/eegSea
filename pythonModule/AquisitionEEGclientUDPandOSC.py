@@ -30,20 +30,20 @@ if __name__ == "__main__":
                'T7','P7','O1',
                'T8','P8','O2'] # list of EEG electrods names
     EEG_FREQ = 128          # fréquense d'acquisition de l'EEG
-    MINQ = 0 # qualité minimale du signal exigée (1 c'est bien, avec 0 tout passe même si le casque n'est pas sur la tête) 
+    MINQ = 1 # qualité minimale du signal exigée (1 c'est bien, avec 0 tout passe même si le casque n'est pas sur la tête) 
     _2pi_inv_eeg_freq = 2*numpy.pi/128
     # ouverture de la socket UDP
     sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
     UDP_IP = "127.0.0.1"    # adresse IP de la machine avec mer unity
     UDP_PORT = 5000         # port udp entre python et unity
     # ouverture de la socket OSC
-    OSC_IP = "127.0.0.1"    # adresse IP de la machine avec le son
-    OSC_PORT = 5001         # port OSC entre python et le son
-    client = OSC.OSCClient()
-    client.connect((OSC_IP,OSC_PORT))
-    alphaOSC = 1.0/30       # fréquence pour la maj des max (1.0/30 -> 60 secondes de vie)
-    msg = OSC.OSCMessage()
-    msg.setAddress("/test")
+    #OSC_IP = "127.0.0.1"    # adresse IP de la machine avec le son
+    #OSC_PORT = 5001         # port OSC entre python et le son
+    #client = OSC.OSCClient()
+    #client.connect((OSC_IP,OSC_PORT))
+    #alphaOSC = 1.0/30       # fréquence pour la maj des max (1.0/30 -> 60 secondes de vie)
+    #msg = OSC.OSCMessage()
+    #msg.setAddress("/test")
     # choix de la fréquence des envois udp
     udp_freq = 10           # (Hz) fréquence de l'envoi des trames udp et osc
     udp_period = 1./udp_freq
@@ -185,12 +185,12 @@ if __name__ == "__main__":
                         if gammaWaves[i]>gammaMax[i] : gammaMax[i]=gammaWaves[i]
                         gammaWaves[i]=(gammaWaves[i]-minAsZero)/(gammaMax[i]-minAsZero)
                 # then build the osc message to send
-                msg.clearData()
-                msg.append('Theta;'+';'.join('%.5g' % val for val in thetaWaves)+';')
-                msg.append('Alpha;'+';'.join('%.5g' % val for val in alphaWaves)+';')
-                msg.append('Beta;'+';'.join('%.5g' % val for val in betaWaves)+';')
-                msg.append('Gamma;'+';'.join('%.5g' % val for val in gammaWaves))
-                client.sendto(msg, (OSC_IP, OSC_PORT))
+                #msg.clearData()
+                #msg.append('Theta;'+';'.join('%.5g' % val for val in thetaWaves)+';')
+                #msg.append('Alpha;'+';'.join('%.5g' % val for val in alphaWaves)+';')
+                #msg.append('Beta;'+';'.join('%.5g' % val for val in betaWaves)+';')
+                #msg.append('Gamma;'+';'.join('%.5g' % val for val in gammaWaves))
+                #client.sendto(msg, (OSC_IP, OSC_PORT))
                 lasttime=now
     except KeyboardInterrupt:
         headset.close()
@@ -199,4 +199,4 @@ if __name__ == "__main__":
     finally:
         headset.close()
         sock.close()
-        client.close()
+        #client.close()

@@ -1,9 +1,9 @@
-# Unity basic ignore
-/Build
 
-/Temp/
-/Library/
-/Obj/
+# Unity basic ignore
+/merUnity/Build
+/merUnity/Library
+/merUnity/Obj
+/merUnity/Temp
  
 *.csproj
 *.unityproj
@@ -69,6 +69,3 @@ docs/_build/
 
 # PyBuilder
 target/
-/merUnity/Library/ShaderCache
-/merUnity/Library/metadata
-/merUnity/Temp

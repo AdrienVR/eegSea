@@ -34,8 +34,10 @@ public class CameraOscillations : MonoBehaviour
 		float oldy = transform.position.y;
 		transform.Translate (0f, 0f, translation);
 		transform.Translate (0f, oldy - transform.position.y, 0f, Space.World);
-		betaValues = Client.getBetaValues ();
-		float gauche = betaValues [0]; // + betaValues [2];
+
+		betaValues = EEGDataManager.Instance.GetBetaValues();
+		
+        float gauche = betaValues [0]; // + betaValues [2];
 		float droite = betaValues [1]; // + betaValues [3];
 		if (gauche <= 0 || droite <= 0) {
 			maxGauche=maxDroite=0f;

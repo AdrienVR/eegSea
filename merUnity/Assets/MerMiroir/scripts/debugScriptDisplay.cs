@@ -19,7 +19,7 @@ public class debugScriptDisplay : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		numberValuesReceivedDisplay =  unchecked((int)Client.numberValuesReceived);
+		numberValuesReceivedDisplay =  unchecked((int)ClientBehavior.Instance.numberValuesReceived);
 
 		startSince = ((DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) - timeStartProgramDisplay) / 1000;
 

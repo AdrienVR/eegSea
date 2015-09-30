@@ -15,15 +15,15 @@ public class moodSpecular : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		Client.moyenneGD ();
-		float delta = Client.maxGD - Client.minGD;
+		EEGDataManager.Instance.MoyenneGD();
+        float delta = EEGDataManager.Instance.Delta;
 		float alpha = Mathf.Min(Time.deltaTime / halftime, 1f);
 		if (delta == 0) {
 			coeff=(1f-alpha)*coeff +alpha*0.5f;
 			GetComponent<Light>().intensity = (leftIntensity * coeff + rightIntensity * (1f-coeff));
 			return;
 		}
-		coeff = (1f-alpha)*coeff+alpha*(Client.maxGD - Client.valGaucheDroite) / delta;
+        coeff = EEGDataManager.Instance.GetAlpha(coeff, alpha, delta);
 		GetComponent<Light>().intensity = (leftIntensity * coeff + rightIntensity * (1f-coeff));
 	
 	}

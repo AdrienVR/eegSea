@@ -68,6 +68,7 @@
      <Compile Include="Assets\MerMiroir\scripts\onSea.cs" />
      <Compile Include="Assets\MerMiroir\scripts\openingSpecular.cs" />
      <None Include="Assets\MerMiroir\Materials\shaders\seaSurface3Shader.shader" />
+     <None Include="Assets\MerMiroir\Config\groups.txt" />
      <None Include="Assets\MerMiroir\Materials\shaders\seaSurface4Shader.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

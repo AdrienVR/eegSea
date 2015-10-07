@@ -29,8 +29,8 @@ if __name__ == "__main__":
                'F4','AF4','FC6','F8',
                'T7','P7','O1',
                'T8','P8','O2'] # list of EEG electrods names
-    EEG_FREQ = 128          # fréquense d'acquisition de l'EEG
-    MINQ = 1 # qualité minimale du signal exigée (1 c'est bien, avec 0 tout passe même si le casque n'est pas sur la tête) 
+    EEG_FREQ = 1          # fréquense d'acquisition de l'EEG
+    MINQ = 0 # qualité minimale du signal exigée (1 c'est bien, avec 0 tout passe même si le casque n'est pas sur la tête) 
     _2pi_inv_eeg_freq = 2*numpy.pi/128
     # ouverture de la socket UDP
     sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
@@ -120,16 +120,22 @@ if __name__ == "__main__":
                 print('\n'.join("%s Reading: %s Quality: %s" %
                                 (k[1], headset.sensors[k[1]]['value'],
                                  headset.sensors[k[1]]['quality']) for k in enumerate(headset.sensors)))
+		
+		mystr=str(now) + ';'
+		for k in enumerate(headset.sensors) :
+			name = str(k[1])
+			val = str(headset.sensors[k[1]]['value'])
+			if(name != '' and val != '') : mystr += name + ":" + val + ";"
+		
+		sock.sendto(mystr,(UDP_IP,UDP_PORT))
+
+
                 print "\nBattery", packet.battery, '% :',
                 if packet.battery<10 :
                     print "maybe", (packet.battery*600)/100, "minutes left"
                     print "WARNING EEG HEADSET HAS LOW BATTERY..."
                 else : print "maybe", (packet.battery*10)/100, "hours left"
-                # affichage des valeurs envoyées en OSC (dans [0,1])
-                print '\nTheta; '+'; '.join('%.5g' % val for val in thetaWaves)
-                print 'Alpha; '+'; '.join('%.5g' % val for val in alphaWaves)
-                print 'Beta ; '+'; '.join('%.5g' % val for val in betaWaves)
-                print 'Gamma; '+'; '.join('%.5g' % val for val in gammaWaves)
+
             # maj du temps réel pour décider de l'envoi par udp
             now=time.time()
             if now-lasttime > udp_period :
@@ -140,14 +146,20 @@ if __name__ == "__main__":
                     betaWaves[i]=numpy.mean(fftMod2[zones[i][0]:zones[i][1],indexes_freq_beta[0]:indexes_freq_beta[1]])
                     if i<3 : gammaWaves[i]=numpy.mean(fftMod2[:,indexes_freq_gamma[i][0]:indexes_freq_gamma[i][1]])
                 # print nt, 'send udp at', now-inittime, ':'
-                mystr='Theta;'+';'.join('%.5g' % val for val in thetaWaves)
-                sock.sendto(mystr,(UDP_IP,UDP_PORT))
-                mystr='Basse;'+';'.join('%.5g' % val for val in alphaWaves)
-                sock.sendto(mystr,(UDP_IP,UDP_PORT))
-                mystr='Haute;'+';'.join('%.5g' % val for val in betaWaves)
-                sock.sendto(mystr,(UDP_IP,UDP_PORT))
-                mystr='THF;'+';'.join('%.5g' % val for val in gammaWaves)
-                sock.sendto(mystr,(UDP_IP,UDP_PORT))
+                # mystr='Theta;'+';'.join('%.5g' % val for val in thetaWaves)
+                # sock.sendto(mystr,(UDP_IP,UDP_PORT))
+                # mystr='Basse;'+';'.join('%.5g' % val for val in alphaWaves)
+                # sock.sendto(mystr,(UDP_IP,UDP_PORT))
+                # mystr='Haute;'+';'.join('%.5g' % val for val in betaWaves)
+                # sock.sendto(mystr,(UDP_IP,UDP_PORT))
+                # mystr='THF;'+';'.join('%.5g' % val for val in gammaWaves)
+                # sock.sendto(mystr,(UDP_IP,UDP_PORT))
+		#mystr='t=' + str(now) + ';'
+		#sock.sendto(mystr,(UDP_IP,UDP_PORT))
+		#for i in range(14) :
+		#	mystr='e' + str(i) + ':\n' + str(current-datas[i])
+		#	sock.sendto(mystr,(UDP_IP,UDP_PORT))
+		
 
                 # print nt, 'send osc at', now-inittime, ':'
                 # first computes values in [0,1] (0 non energy , 1 max energy)

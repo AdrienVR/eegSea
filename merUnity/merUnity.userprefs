@@ -1,12 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\MerMiroir\scripts\Curve.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\GrahpTester.cs">
     <Files>
-      <File FileName="Assets\MerMiroir\scripts\Curve.cs" Line="1" Column="1" />
-      <File FileName="Assets\MerMiroir\scripts\Graphs.cs" Line="1" Column="1" />
-      <File FileName="Assets\MerMiroir\scripts\ClientBehavior.cs" Line="1" Column="1" />
-      <File FileName="Assets\MerMiroir\scripts\Client.cs" Line="1" Column="1" />
-      <File FileName="Assets\MerMiroir\scripts\EEGDataManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\MerMiroir\scripts\GraphManager.cs" Line="48" Column="32" />
+      <File FileName="Assets\GrahpTester.cs" Line="18" Column="51" />
+      <File FileName="Assets\MerMiroir\scripts\Curve.cs" Line="20" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

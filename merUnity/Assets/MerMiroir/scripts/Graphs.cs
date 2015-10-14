@@ -2,6 +2,9 @@
 using System.Collections;
 
 public class Graphs : MonoBehaviour {
+
+    public float speed = 0.1f;
+
     public float val1;
     public AnimationCurve courbe1;
 	// Use this for initialization

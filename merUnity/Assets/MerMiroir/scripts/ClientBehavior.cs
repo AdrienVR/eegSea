@@ -14,6 +14,11 @@ public class ClientBehavior : MonoBehaviour {
 
     public int numberValuesReceived = 0;
 
+    static int nbSensors = 14;
+    static string[] sensorName = new string[14];
+    static float[] sensorVal = new float[14];
+    static float sensorTime = 0.0f;
+
     void Awake()
     {
         if (Instance == null)
@@ -70,7 +75,30 @@ public class ClientBehavior : MonoBehaviour {
             {
                 IPEndPoint receiver = new IPEndPoint(IPAddress.Any, 0); //spécification du port et de l'adresse IP a écouter
                 byte[] receivedBytes = client.Receive(ref receiver); //récéption de la trame UDP
-                data = Encoding.ASCII.GetString(receivedBytes); //transformer la trame en chaine 
+                data = Encoding.ASCII.GetString(receivedBytes); //transformer la trame en chaine
+
+                //Réception des données de capteur brutes
+        				//Format : 4.391409;e1:0;e2:0;e3:0;e4:0;2:-0.146730474455;e3:-0.146730474455;e4:-0.146730474455;74;
+        				// temps;capteur1:val1;capteur2:val2;capteur3:val3;
+        				string[] sensorStrings = data.Split(new char[] { ';' });
+        				bool first = true;
+        				for(int i=0 ; i<sensorStrings.Length ; i++)
+        				{
+        					//Information de temps en première position
+        					if(first)
+        					{
+        						sensorTime = float.Parse(sensorStrings[0]);
+        						first = false;
+        					}
+        					//Noms et valeurs de capteurs ensuite
+        					else
+        					{
+        						string[] sensorValues = sensorStrings[i].Split(new char[] { ':' });
+        						sensorName[i-1] = sensorValues[0];
+        						sensorVal[i-1] = float.Parse(sensorValues[1]);
+        						Debug.Log(sensorTime.ToString() + " - " + sensorName[i-1] + " : " + sensorVal[i-1].ToString() + "\n");
+        					}
+        				}
 
                 if (data.Length > 5)
                 {
@@ -90,12 +118,12 @@ public class ClientBehavior : MonoBehaviour {
 
                 Debug.Log("No date since " + ((Time.realtimeSinceStartup) - lastTimestampReceived) + " s, Transmiting 0 values ...");
 
-               // if (((Time.realtimeSinceStartup) - lastTimestampReceived) > 1) 
+               // if (((Time.realtimeSinceStartup) - lastTimestampReceived) > 1)
 				//   EEGData.Instance.ResetValues();
             }
             yield return new WaitForSeconds(.05f);
 		}
-		
+
 		yield break;
     }
 

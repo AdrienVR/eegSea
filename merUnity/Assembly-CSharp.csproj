@@ -50,15 +50,12 @@
      <Compile Include="Assets\MerMiroir\scripts\CameraOscillations.cs" />
      <Compile Include="Assets\MerMiroir\scripts\CameraUpSea.cs" />
      <Compile Include="Assets\MerMiroir\scripts\Client.cs" />
-<<<<<<< HEAD
-     <Compile Include="Assets\MerMiroir\scripts\Fft.cs" />
-     <Compile Include="Assets\MerMiroir\scripts\Graphs.cs" />
-=======
      <Compile Include="Assets\MerMiroir\scripts\ClientBehavior.cs" />
      <Compile Include="Assets\MerMiroir\scripts\EEGDataManager.cs" />
+     <Compile Include="Assets\MerMiroir\scripts\Fft.cs" />
+     <Compile Include="Assets\MerMiroir\scripts\Graphs.cs" />
      <Compile Include="Assets\MerMiroir\scripts\Interface\GraphRenderer3D.cs" />
      <Compile Include="Assets\MerMiroir\scripts\MathsTool.cs" />
->>>>>>> 261da810f60c440a79e3ff29726ca06972ca3b3e
      <Compile Include="Assets\MerMiroir\scripts\MeshSea.cs" />
      <Compile Include="Assets\MerMiroir\scripts\MoodLight.cs" />
      <Compile Include="Assets\MerMiroir\scripts\PlusieurVagues.cs" />
@@ -69,17 +66,14 @@
      <Compile Include="Assets\MerMiroir\scripts\moodSpecular.cs" />
      <Compile Include="Assets\MerMiroir\scripts\onSea.cs" />
      <Compile Include="Assets\MerMiroir\scripts\openingSpecular.cs" />
+     <Compile Include="Assets\MerMiroir\scripts\testFft.cs" />
      <None Include="Assets\MerMiroir\Materials\shaders\seaSurface3Shader.shader" />
      <None Include="Assets\MerMiroir\Materials\shaders\seaSurface4Shader.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity5/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
-<<<<<<< HEAD
  <HintPath>C:/Program Files/Unity5/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
-=======
- <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
->>>>>>> 261da810f60c440a79e3ff29726ca06972ca3b3e
  </Reference>
  <Reference Include="Mono.Cecil">
  <HintPath>C:/Program Files/Unity5/Editor/Data/Managed/Mono.Cecil.dll</HintPath>

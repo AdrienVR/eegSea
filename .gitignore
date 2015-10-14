@@ -70,3 +70,5 @@ target/
 /merUnity/Build
 /merunity/Assembly-CSharp.csproj
 /merUnity/merUnity.sln
+/merUnity/merUnity.sln
+/merUnity/*.csproj

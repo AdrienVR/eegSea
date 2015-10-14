@@ -35,6 +35,9 @@ if __name__ == "__main__":
     lasttime=inittime
     now=lasttime
 
+    buf = ""
+    nbBuf = 0
+
     try:
         while True:
             # maj du temps réel pour décider de l'envoi par udp
@@ -56,9 +59,17 @@ if __name__ == "__main__":
                     val = str(sinVal)
                     if(name != '' and val != '') : mystr += name + ":" + val + ";"
 
-                sock.sendto(mystr,(UDP_IP,UDP_PORT))
+                #sock.sendto(mystr,(UDP_IP,UDP_PORT))
+                buf += mystr + "|"
+                nbBuf += 1
 
                 lasttime=now
+
+            if nbBuf == 10 :
+                sock.sendto(buf, (UDP_IP,UDP_PORT))
+                nbBuf = 0
+                buf = ""
+
     except KeyboardInterrupt:
         sock.close()
         client.close()

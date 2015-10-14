@@ -14,6 +14,8 @@ public class ClientBehavior : MonoBehaviour {
 
     public int numberValuesReceived = 0;
 
+    public const bool UseCoroutine = false;
+
     void Awake()
     {
         if (Instance == null)
@@ -40,10 +42,24 @@ public class ClientBehavior : MonoBehaviour {
 
     public void LaunchThread()
     {
-        if (m_threadEnabled == false)
+        if (UseCoroutine)
         {
-            m_threadEnabled = true;
-            StartCoroutine(ReceiveData());
+            if (m_threadEnabled == false)
+            {
+                m_threadEnabled = true;
+                StartCoroutine(ReceiveDataCoroutine());
+            }
+        }
+        else
+        {
+            if (m_threadEnabled == false)
+            {
+                m_threadEnabled = true;
+                Application.runInBackground = true;
+                m_receiveThread = new Thread(new ThreadStart(ReceiveDataLoop)); //Créer un thread pour écouter le server UDP
+                m_receiveThread.IsBackground = true;
+                m_receiveThread.Start();
+            }
         }
     }
 
@@ -59,40 +75,67 @@ public class ClientBehavior : MonoBehaviour {
         double frequency = numberValuesReceived / (dateRunProgram);
         Debug.Log("Approximate frequency : " + frequency + " Values/seconds");
 
+        if (m_receiveThread != null)
+        {
+            m_receiveThread.Abort();
+        }
+
         client.Close();
     }
 
-    private IEnumerator ReceiveData()
+    private float GetRealTime()
+    {
+        if (UseCoroutine)
+        {
+            return Time.realtimeSinceStartup;
+        }
+        return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond / 1000f;
+    }
+
+    private void ReceiveData()
+    {
+        try
+        {
+            IPEndPoint receiver = new IPEndPoint(IPAddress.Any, 0); //spécification du port et de l'adresse IP a écouter
+            byte[] receivedBytes = client.Receive(ref receiver); //récéption de la trame UDP
+            data = Encoding.ASCII.GetString(receivedBytes); //transformer la trame en chaine 
+
+            if (data.Length > 5)
+            {
+                //Debug.Log (data.ToString());
+                string[] split = data.Split(new char[] { ';' });
+
+                EEGDataManager.Instance.Update(split);
+
+                lastDataReceived = data;
+                numberValuesReceived += 1;
+                lastTimestampReceived = GetRealTime();
+            }
+        }
+        catch (Exception Err)
+        {
+            Debug.Log(Err.ToString());
+
+            Debug.Log("No date since " + (GetRealTime() - lastTimestampReceived) + " s, Transmiting 0 values ...");
+
+            // if (((Time.realtimeSinceStartup) - lastTimestampReceived) > 1) 
+            //   EEGData.Instance.ResetValues();
+        }
+    }
+
+    private void ReceiveDataLoop()
+    {
+        while (true)
+        {
+            ReceiveData();
+        }
+    }
+
+    private IEnumerator ReceiveDataCoroutine()
     {
         while (m_threadEnabled == true)
         {
-            try
-            {
-                IPEndPoint receiver = new IPEndPoint(IPAddress.Any, 0); //spécification du port et de l'adresse IP a écouter
-                byte[] receivedBytes = client.Receive(ref receiver); //récéption de la trame UDP
-                data = Encoding.ASCII.GetString(receivedBytes); //transformer la trame en chaine 
-
-                if (data.Length > 5)
-                {
-                    //Debug.Log (data.ToString());
-                    string[] split = data.Split(new char[] { ';' });
-
-                    EEGDataManager.Instance.Update(split);
-
-                    lastDataReceived = data;
-                    numberValuesReceived += 1;
-                    lastTimestampReceived = Time.realtimeSinceStartup;
-                }
-            }
-            catch (Exception Err)
-            {
-                Debug.Log(Err.ToString());
-
-                Debug.Log("No date since " + ((Time.realtimeSinceStartup) - lastTimestampReceived) + " s, Transmiting 0 values ...");
-
-               // if (((Time.realtimeSinceStartup) - lastTimestampReceived) > 1) 
-				//   EEGData.Instance.ResetValues();
-            }
+            ReceiveData();
             yield return new WaitForSeconds(.05f);
 		}
 		
@@ -111,4 +154,5 @@ public class ClientBehavior : MonoBehaviour {
 
     private float lastTimestampReceived = 0;
     private float timestampStartProgram = 0;
+    private Thread m_receiveThread;
 }

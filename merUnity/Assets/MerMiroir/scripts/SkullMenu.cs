@@ -4,19 +4,20 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System.IO;
 using System.Text;
-using UnityEditor;
 
 public class SkullMenu : MonoBehaviour
 {
 
     public GameObject[] Toggles;
-    public GameObject dropdown, addUI, field, dialog, question;
-    public GameObject alpha_m, alpha_M, beta_m, beta_M, gamma1_m, gamma1_M, gamma2_m, gamma2_M, gamma3_m, gamma3_M, theta_m, theta_M;
+	public GameObject dropdown, dropdown2, addUI, addUI2, field, field2, dialog, dialog2, question, question2;
+    public GameObject freq_m, freq_M;
+	public Button validBtn;
     private List<int> elecs_on;
     private Dictionary<int, List<int>> groups, freqs;
     string path = "Assets/MerMiroir/Config/groups.txt";
-
-    // Use this for initialization
+	string pathFreqs = "Assets/MerMiroir/Config/freqs.txt";
+	
+	// Use this for initialization
     void Start()
     {
         elecs_on = new List<int>();
@@ -36,6 +37,7 @@ public class SkullMenu : MonoBehaviour
             elecs_on.Remove(nb);
             //Debug.Log("Electrode " + nb + " retirée.");
         }
+		testValid ();
     }
 
     // Callback function for group dropdown
@@ -50,23 +52,18 @@ public class SkullMenu : MonoBehaviour
         {
             switchOn(i);
         }
-        alpha_m.GetComponent<InputField>().text = freqs[nb][0].ToString();
-        alpha_M.GetComponent<InputField>().text = freqs[nb][1].ToString();
-        beta_m.GetComponent<InputField>().text = freqs[nb][2].ToString();
-        beta_M.GetComponent<InputField>().text = freqs[nb][3].ToString();
-        gamma1_m.GetComponent<InputField>().text = freqs[nb][4].ToString();
-        gamma1_M.GetComponent<InputField>().text = freqs[nb][5].ToString();
-        gamma2_m.GetComponent<InputField>().text = freqs[nb][6].ToString();
-        gamma2_M.GetComponent<InputField>().text = freqs[nb][7].ToString();
-        gamma3_m.GetComponent<InputField>().text = freqs[nb][8].ToString();
-        gamma3_M.GetComponent<InputField>().text = freqs[nb][9].ToString();
-        theta_m.GetComponent<InputField>().text = freqs[nb][10].ToString();
-        theta_M.GetComponent<InputField>().text = freqs[nb][11].ToString();
     }
 
-    // Callback function for plus button
-    public void displayAddUI()
-    {
+	// Callback function for frequences dropdown
+	public void selectFrequence(System.Int32 nb)
+	{
+		freq_m.GetComponent<InputField> ().text = freqs [nb][0].ToString();
+		freq_M.GetComponent<InputField> ().text = freqs [nb][1].ToString();
+	}
+	
+	// Callback function for plus button
+	public void displayAddUI()
+	{
         addUI.SetActive(true);
     }
 
@@ -74,6 +71,15 @@ public class SkullMenu : MonoBehaviour
     {
         addUI.SetActive(false);
     }
+	public void displayAddUI2()
+	{
+		addUI2.SetActive(true);
+	}
+	
+	public void hideAddUI2()
+	{
+		addUI2.SetActive(false);
+	}
 
     public void displayDialog()
     {
@@ -84,8 +90,32 @@ public class SkullMenu : MonoBehaviour
     {
         dialog.SetActive(false);
     }
+	public void displayDialog2()
+	{
+		dialog2.SetActive(true);
+	}
+	
+	public void hideDialog2()
+	{
+		dialog2.SetActive(false);
+	}
+	public void testValid()
+	{
+		bool result;
+		bool cond1 = (freq_m.GetComponent<InputField> ().text != "");
+		bool cond2 = (freq_M.GetComponent<InputField> ().text != "");
+		bool cond3 = (elecs_on.Count != 0);
+		if (cond1 && cond2 && cond3)
+		{
+			validBtn.interactable=true;
+		}
+		else
+		{
+			validBtn.interactable=false;
+		}
+	}
 
-    // Call function for Add button
+    // Callback function for Add button
     public void addGroup()
     {
         InputField inF = (InputField)field.GetComponent<InputField>();
@@ -94,13 +124,28 @@ public class SkullMenu : MonoBehaviour
         {
             string textQ;
             if(elecs_on.Count == 1)
-                textQ= "Ajouter cette electrode et ces fréquences au groupe '" + name + "' ?";
+                textQ= "Ajouter cette electrode au groupe '" + name + "' ?";
             else
-                textQ = "Ajouter ces " + elecs_on.Count + " electrode et ces fréquences au groupe '" + name + "' ?";
+                textQ = "Ajouter ces " + elecs_on.Count + " electrodes au groupe '" + name + "' ?";
             question.GetComponent<Text>().text = textQ;
             displayDialog();
         }
     }
+
+	// Callback function for Add button 2
+	public void addFrequence()
+	{
+		InputField inF = (InputField)field2.GetComponent<InputField>();
+		string name = inF.text;
+		bool cond1 = (freq_m.GetComponent<InputField> ().text != "");
+		bool cond2 = (freq_M.GetComponent<InputField> ().text != "");
+		if (cond1 && cond2 && name != "")
+		{
+			string textQ = "Ajouter ces fréquences sous le nom '" + name + "' ?";
+			question2.GetComponent<Text>().text = textQ;
+			displayDialog2();
+		}
+	}
 
     public void saveGroup()
     {
@@ -117,29 +162,7 @@ public class SkullMenu : MonoBehaviour
             electrodes += (e-1).ToString();
             first = false;
         }
-        string frequences = "";
-        first = true;
-        List<int> freqs_list = new List<int>();
-        freqs_list.Add(int.Parse(alpha_m.GetComponent<InputField>().text));
-        freqs_list.Add(int.Parse(alpha_M.GetComponent<InputField>().text));
-        freqs_list.Add(int.Parse(beta_m.GetComponent<InputField>().text));
-        freqs_list.Add(int.Parse(beta_M.GetComponent<InputField>().text));
-        freqs_list.Add(int.Parse(gamma1_m.GetComponent<InputField>().text));
-        freqs_list.Add(int.Parse(gamma1_M.GetComponent<InputField>().text));
-        freqs_list.Add(int.Parse(gamma2_m.GetComponent<InputField>().text));
-        freqs_list.Add(int.Parse(gamma2_M.GetComponent<InputField>().text));
-        freqs_list.Add(int.Parse(gamma3_m.GetComponent<InputField>().text));
-        freqs_list.Add(int.Parse(gamma3_M.GetComponent<InputField>().text));
-        freqs_list.Add(int.Parse(theta_m.GetComponent<InputField>().text));
-        freqs_list.Add(int.Parse(theta_M.GetComponent<InputField>().text));
-        foreach (int f in freqs_list)
-        {
-            if (!first)
-                frequences += ",";
-            frequences += f.ToString();
-            first = false;
-        }
-        string sentence = name + ";" + electrodes + ";" + frequences + ";";
+        string sentence = name + ";" + electrodes + ";";
         StreamWriter sw = File.AppendText(path);
         sw.Write(sentence);
         sw.Close();
@@ -147,19 +170,39 @@ public class SkullMenu : MonoBehaviour
         dropdown.GetComponent<Dropdown>().value = groups.Count;
     }
 
+	public void saveFrequence()
+	{
+		hideDialog2();
+		hideAddUI2();
+		InputField inF = (InputField)field2.GetComponent<InputField>();
+		string name = inF.text;
+		string frequences = freq_m.GetComponent<InputField> ().text+","+freq_M.GetComponent<InputField> ().text;
+		string sentence = name + ";" + frequences + ";";
+		StreamWriter sw = File.AppendText(pathFreqs);
+		sw.Write(sentence);
+		sw.Close();
+		initGroups();
+		dropdown2.GetComponent<Dropdown>().value = freqs.Count;
+	}
+
+	public void addConfig()
+	{
+		Group g = new Group (elecs_on, int.Parse (freq_m.GetComponent<InputField> ().text), int.Parse (freq_M.GetComponent<InputField> ().text));
+		Debug.Log (g.getText());
+	}
+
     void initGroups()
     {
         groups = new Dictionary<int, List<int>>();
         freqs = new Dictionary<int, List<int>>();
         if (!getGroups())
         {
-            Debug.LogError("Error while reading groups file.");
+            Debug.LogError("Error while reading electrode groups file.");
         }
-    }
-
-    public void test()
-    {
-        Debug.Log("test");
+		if (!getFreqs())
+		{
+			Debug.LogError("Error while reading freqs file.");
+		}
     }
 
     // Function used to get the groups that are saved into the config file
@@ -178,20 +221,14 @@ public class SkullMenu : MonoBehaviour
                 {
                     d.options.RemoveAt(j);
                 }
-                for (int i = 0; i < lines.Length - 2; i++)
+                for (int i = 0; i < lines.Length - 1; i++)
                 {
                     d.options.Add(new Dropdown.OptionData(lines[i]));
                     List<int> electrodes = new List<int>();
                     foreach (string s in lines[i + 1].Split(','))
                         electrodes.Add(int.Parse(s));
                     groups.Add(groups.Count, electrodes);
-                    List<int> f = new List<int>();
-                    foreach (string s in lines[i+2].Split(','))
-                    {
-                        f.Add(int.Parse(s));
-                    }
-                    freqs.Add(groups.Count-1, f);
-                    i += 2;
+                    i ++;
                 }
                 file.Close();
             }
@@ -210,15 +247,56 @@ public class SkullMenu : MonoBehaviour
     }
 
 
-    void switchOn(int i)
-    {
-        Toggle t = (Toggle) Toggles[i].GetComponent<Toggle>();
-        t.isOn = true;
-    }
-    void switchOff(int i)
-    {
-        Toggle t = (Toggle)Toggles[i].GetComponent<Toggle>();
-        t.isOn = false;
-    }
-
+	// Function used to get the frequences that are saved into the config file
+	bool getFreqs()
+	{
+		bool state = true;
+		if (File.Exists(pathFreqs))
+		{
+			try
+			{
+				StreamReader file = File.OpenText(pathFreqs);
+				string[] lines = file.ReadToEnd().Split(';');
+				Dropdown d = (Dropdown)dropdown2.GetComponent<Dropdown>();
+				int size = d.options.Count;
+				for (int j = size - 1; j >0 - 1; j--)
+				{
+					d.options.RemoveAt(j);
+				}
+				for (int i = 0; i < lines.Length - 1; i++)
+				{
+					d.options.Add(new Dropdown.OptionData(lines[i]));
+					List<int> f = new List<int>();
+					foreach (string s in lines[i + 1].Split(','))
+						f.Add(int.Parse(s));
+					freqs.Add(freqs.Count, f);
+					i ++;
+				}
+				file.Close();
+			}
+			catch(IOException e)
+			{
+				state = false;
+				Debug.LogError(e.Message);
+			}
+		}
+		else
+		{
+			state = false;
+			Debug.LogError("Cannot open file : " + path);
+		}
+		return state;
+	}
+	
+	void switchOn(int i)
+	{
+		Toggle t = (Toggle) Toggles[i].GetComponent<Toggle>();
+		t.isOn = true;
+	}
+	void switchOff(int i)
+	{
+		Toggle t = (Toggle)Toggles[i].GetComponent<Toggle>();
+		t.isOn = false;
+	}
+	
 }

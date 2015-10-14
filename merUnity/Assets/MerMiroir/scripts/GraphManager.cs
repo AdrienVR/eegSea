@@ -18,6 +18,8 @@ public class GraphManager : MonoBehaviour
     public float MaxLength;
 
 	public int NGraphs = 4;
+    public int Lines;
+    public int Raws;
 
     void Awake()
     {
@@ -89,14 +91,14 @@ public class GraphManager : MonoBehaviour
 
     private Rect ComputeRect(int currentIndex, int maxGraphs)
     {
-        int lines = Mathf.RoundToInt(Mathf.Sqrt(maxGraphs));
-        int raws = (int)Mathf.CeilToInt((float)maxGraphs / lines);//, MidpointRounding.AwayFromZero);
+        Lines = Mathf.RoundToInt(Mathf.Sqrt(maxGraphs));
+        Raws = Mathf.CeilToInt((float)maxGraphs / Lines);
 
-		m_curveSize = new Vector2((1 - 2 * CornerOffset.x - (raws - 1) * BetweenEachGraphOffset.x) / ((float)raws), 
-		                          (1 - 2 * CornerOffset.y - (lines - 1) * BetweenEachGraphOffset.y) / ((float)lines));
+        m_curveSize = new Vector2((1 - 2 * CornerOffset.x - (Raws - 1) * BetweenEachGraphOffset.x) / ((float)Raws), 
+		                          (1 - 2 * CornerOffset.y - (Lines - 1) * BetweenEachGraphOffset.y) / ((float)Lines));
 
-		int lineIndex = Mathf.RoundToInt(currentIndex / raws);
-		int rawIndex = currentIndex % raws;
+		int lineIndex = Mathf.RoundToInt(currentIndex / Raws);
+		int rawIndex = currentIndex % Raws;
 
 		int spaceX = Mathf.Max(0, rawIndex);
 		int spaceY = Mathf.Max(0, lineIndex);

@@ -14,8 +14,8 @@ public class GrahpTester : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		if (sensors.Length > 1)
-			sensors [0] = Mathf.Cos (Time.time * sensors [1]) * 50;
+		if (sensors.Length > 4)
+			sensors [3] = Mathf.Cos (Time.time * sensors [1]) * 50;
 
 		UpdateCurveCounts();
 		for(int i = 0;i < sensors.Length ; i++)

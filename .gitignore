@@ -72,3 +72,5 @@ target/
 /merUnity/merUnity.sln
 /merUnity/merUnity.sln
 /merUnity/*.csproj
+/merUnity/merUnity.userprefs
+/merUnity/Assembly-CSharp.csproj

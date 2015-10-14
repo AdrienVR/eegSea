@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class GraphManager : MonoBehaviour
 {
@@ -89,7 +90,7 @@ public class GraphManager : MonoBehaviour
     private Rect ComputeRect(int currentIndex, int maxGraphs)
     {
         int lines = Mathf.RoundToInt(Mathf.Sqrt(maxGraphs));
-		int raws = (int)Mathf.Round(maxGraphs / lines);
+        int raws = (int)Mathf.CeilToInt((float)maxGraphs / lines);//, MidpointRounding.AwayFromZero);
 
 		m_curveSize = new Vector2((1 - 2 * CornerOffset.x - (raws - 1) * BetweenEachGraphOffset.x) / ((float)raws), 
 		                          (1 - 2 * CornerOffset.y - (lines - 1) * BetweenEachGraphOffset.y) / ((float)lines));

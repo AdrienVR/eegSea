@@ -13,40 +13,50 @@ public class Curve : MonoBehaviour
 
 	public RectTransform TrailedPixel;
 
+    public const float FakeMaxValue = 50;
+    public const float HighestPositionRatio = 0.85f;
+
+    private float GetHeight(float value)
+    {
+        if ((GraphManager.Instance.Raws * GraphManager.Instance.Lines) % 2 == 0)
+        {
+            return value * m_cameraHeight * HighestPositionRatio * m_cameraHeight /
+                (2 * m_cameraWidth);
+        }
+        return value * m_cameraHeight * HighestPositionRatio * m_cameraHeight /
+                (m_cameraWidth);
+    }
+
     // Use this for initialization
     void Start()
     {
+        m_camera = GetComponent<Camera>();
+        m_cameraHeight = Screen.height * m_camera.rect.height;
+        m_cameraWidth = Screen.width * m_camera.rect.width;
+        Debug.Log(m_cameraHeight);
+        m_currentMaxValue = new MaxValue(1, m_valueDuration);
     }
+
+    private float m_cameraHeight;
+    private float m_cameraWidth;
+    private Camera m_camera;
 
     // Update is called once per frame
     void Update()
     {
+        m_cameraHeight = Screen.height * m_camera.rect.height;
+        m_cameraWidth = Screen.width * m_camera.rect.width;
+
         // MAX
-        if (m_currentMaxValue == null || m_value > m_currentMaxValue.Value)
+        if (m_currentMaxValue == null || Mathf.Abs(m_value) > Mathf.Abs(m_currentMaxValue.Value))
         {
-            m_currentMaxValue = new MinMaxValue(m_value, m_valueDuration);
+            m_currentMaxValue = new MaxValue(m_value, m_valueDuration);
         }
 
-        m_maxValue = m_currentMaxValue.Value;
-        m_currentMaxValue.Update(Time.deltaTime);
-
-        if (m_currentMaxValue == null)
-            m_currentMaxValue = new MinMaxValue(LookForMaxValue(), m_valueDuration);
-
-        // MIN
-        if (m_currentMinValue == null || m_value < m_currentMinValue.Value)
+        if (m_currentMaxValue.Update(Time.deltaTime) == true)
         {
-            if (m_currentMaxValue.Value != m_value)
-                m_currentMinValue = new MinMaxValue(m_value, m_valueDuration);
-            else
-                m_currentMinValue = new MinMaxValue(0, m_valueDuration);
+            m_currentMaxValue = new MaxValue(LookForMaxValue(), m_valueDuration);
         }
-
-        m_minValue = m_currentMinValue.Value;
-        m_currentMinValue.Update(Time.deltaTime);
-
-        if (m_currentMinValue == null)
-            m_currentMinValue = new MinMaxValue(LookForMinValue(), m_valueDuration);
     }
 	
 	void LateUpdate()
@@ -64,20 +74,20 @@ public class Curve : MonoBehaviour
 
     public void UpdatePositions()
     {
-		Debug.Log (m_value);
-		if (TrailedPixel != null)
-			TrailedPixel.localPosition = new Vector3 (TrailedPixel.localPosition.x + 0, 
-			                                          m_value,//TrailedPixel.localPosition.y + m_value,
+        float percent = m_value / m_currentMaxValue.AbsValue;
+
+        if (TrailedPixel != null)
+			TrailedPixel.localPosition = new Vector3 (TrailedPixel.localPosition.x + 0,
+                                                      GetHeight(percent),//m_value,
 			                                          TrailedPixel.localPosition.z + 0);
-		// * m_value;// + Vector3.right * 248;//(m_value - m_minValue)/(m_maxValue);
     }
 
     private float LookForMaxValue()
     {
-        float max = 0;
+        float max = 1;
         foreach(float value in m_values)
         {
-            if (value != m_maxValue && value>max)
+            if (value != m_currentMaxValue.Value && value>max)
             {
                 max = value;
             }
@@ -85,48 +95,30 @@ public class Curve : MonoBehaviour
         return max;
     }
 
-    private float LookForMinValue()
-    {
-        float min = 0;
-        foreach (float value in m_values)
-        {
-            if (value != m_minValue && value < min)
-            {
-                min = value;
-            }
-        }
-        return min;
-    }
-
     private float m_value;
-    private float m_maxValueEver;
 
-    private MinMaxValue m_currentMaxValue;
+    private MaxValue m_currentMaxValue;
 
-    private float m_valueDuration = 1;
-
-    private float m_minValue;
-    private float m_maxValue;
-
-    private MinMaxValue m_currentMinValue;
+    private const float m_valueDuration = 10;
 
     private SlidingBuffer<float> m_values = new SlidingBuffer<float>(10);
 
-    public class MinMaxValue : Object
+    public class MaxValue
     {
         public float Value;
+        public float AbsValue;
 
-        public MinMaxValue(float value, float lifeTime)
+        public MaxValue(float value, float lifeTime)
         {
             Value = value;
+            AbsValue = Mathf.Abs(Value);
             m_lifeTime = lifeTime;
         }
 
-        public void Update(float deltaTime)
+        public bool Update(float deltaTime)
         {
             m_lifeTime -= deltaTime;
-            if (m_lifeTime < 0)
-                Object.Destroy(this);
+            return (m_lifeTime < 0);
         }
 
         private float m_lifeTime;

@@ -1,16 +1,16 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\MerMiroir\scripts\ClientBehavior.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\GrahpTester.cs">
     <Files>
-      <File FileName="Assets\MerMiroir\scripts\ClientBehavior.cs" Line="90" Column="20" />
-      <File FileName="Assets\MerMiroir\scripts\Client.cs" Line="276" Column="3" />
-      <File FileName="Assets\MerMiroir\scripts\EEGDataManager.cs" Line="14" Column="1" />
+      <File FileName="Assets\MerMiroir\scripts\GraphManager.cs" Line="48" Column="32" />
+      <File FileName="Assets\GrahpTester.cs" Line="18" Column="51" />
+      <File FileName="Assets\MerMiroir\scripts\Curve.cs" Line="20" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="C:\Users\default.PC001-PC\Documents\eegSea\merUnity\Assets\MerMiroir\scripts\ClientBehavior.cs" line="29" />
-      <Breakpoint file="C:\Users\default.PC001-PC\Documents\eegSea\merUnity\Assets\MerMiroir\scripts\ClientBehavior.cs" line="19" />
+      <Breakpoint file="C:\Users\default.PC001-PC\Documents\eegSea\merUnity\Assets\MerMiroir\scripts\ClientBehavior.cs" line="24" />
+      <Breakpoint file="C:\Users\default.PC001-PC\Documents\eegSea\merUnity\Assets\MerMiroir\scripts\ClientBehavior.cs" line="14" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

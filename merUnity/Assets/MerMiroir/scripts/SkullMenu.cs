@@ -9,11 +9,12 @@ public class SkullMenu : MonoBehaviour
 {
 
     public GameObject[] Toggles;
-	public GameObject dropdown, dropdown2, addUI, addUI2, field, field2, dialog, dialog2, question, question2;
-    public GameObject freq_m, freq_M;
-	public Button validBtn;
+	public GameObject dropdown, dropdown2, addUI, addUI2, field, field2, dialog, dialog2, dialog3, question, question2, rightPanel;
+    public GameObject freq_m, freq_M, configName;
+	public Button validBtn, validBtn2;
     private List<int> elecs_on;
     private Dictionary<int, List<int>> groups, freqs;
+	public List<Group> config_list;
     string path = "Assets/MerMiroir/Config/groups.txt";
 	string pathFreqs = "Assets/MerMiroir/Config/freqs.txt";
 	
@@ -21,6 +22,7 @@ public class SkullMenu : MonoBehaviour
     void Start()
     {
         elecs_on = new List<int>();
+		config_list = new List<Group> ();
         initGroups();
     }
 
@@ -99,19 +101,48 @@ public class SkullMenu : MonoBehaviour
 	{
 		dialog2.SetActive(false);
 	}
+	public void displayDialog3()
+	{
+		dialog3.SetActive(true);
+	}
+	
+	public void hideDialog3()
+	{
+		dialog3.SetActive(false);
+	}
 	public void testValid()
 	{
 		bool result;
 		bool cond1 = (freq_m.GetComponent<InputField> ().text != "");
 		bool cond2 = (freq_M.GetComponent<InputField> ().text != "");
 		bool cond3 = (elecs_on.Count != 0);
-		if (cond1 && cond2 && cond3)
+		bool cond4 = (config_list.Count < 8);
+		bool cond5 = (config_list.Count > 0 && config_list.Count <9);
+		if (cond1 && cond2 && cond3 && cond4)
 		{
 			validBtn.interactable=true;
 		}
 		else
 		{
 			validBtn.interactable=false;
+		}
+		if (cond5)
+		{
+			validBtn2.interactable = true;
+		}
+		else
+		{
+			validBtn2.interactable=false;
+		}
+
+	}
+
+	public void Valid()
+	{
+		Application.Quit ();
+		foreach (Group g in config_list)
+		{
+			Debug.Log (g.getText());
 		}
 	}
 
@@ -137,11 +168,13 @@ public class SkullMenu : MonoBehaviour
 	{
 		InputField inF = (InputField)field2.GetComponent<InputField>();
 		string name = inF.text;
-		bool cond1 = (freq_m.GetComponent<InputField> ().text != "");
-		bool cond2 = (freq_M.GetComponent<InputField> ().text != "");
+		string f1 = freq_m.GetComponent<InputField> ().text;
+		string f2 = freq_M.GetComponent<InputField> ().text;
+		bool cond1 = (f1 != "");
+		bool cond2 = (f2 != "");
 		if (cond1 && cond2 && name != "")
 		{
-			string textQ = "Ajouter ces fréquences sous le nom '" + name + "' ?";
+			string textQ = "Ajouter la plage de fréquences ("+f1+" -> "+f2+" Hz) sous le nom '" + name + "' ?";
 			question2.GetComponent<Text>().text = textQ;
 			displayDialog2();
 		}
@@ -187,8 +220,45 @@ public class SkullMenu : MonoBehaviour
 
 	public void addConfig()
 	{
-		Group g = new Group (elecs_on, int.Parse (freq_m.GetComponent<InputField> ().text), int.Parse (freq_M.GetComponent<InputField> ().text));
-		Debug.Log (g.getText());
+		if (config_list.Count < 8)
+		{
+			bool sameName = false;
+			string n = configName.GetComponent<InputField> ().text;
+			foreach(Group g in config_list)
+			{
+				if(n == g.getName())
+				{
+					sameName = true;
+				}
+			}
+			if(!sameName)
+			{
+				configName.GetComponent<InputField> ().text="";
+				Group g = new Group (n, elecs_on, int.Parse (freq_m.GetComponent<InputField> ().text), int.Parse (freq_M.GetComponent<InputField> ().text));
+				config_list.Add (g);
+				reDrawConfig ();
+				hideDialog3 ();
+			}
+		}
+		testValid ();
+
+	}
+
+	public void reDrawConfig()
+	{
+		foreach (Transform t in rightPanel.transform)
+		{
+			Destroy(t.gameObject);
+		}
+		for (int i =0; i <config_list.Count; i++)
+		{
+			GameObject configUI = (GameObject)Instantiate(Resources.Load ("Config"));
+			configUI.transform.SetParent (rightPanel.transform);
+			Vector3 delta = new Vector3 (0, -80*i, 0);
+			configUI.transform.position = rightPanel.transform.position+delta;
+			ConfigUI conf = configUI.GetComponent<ConfigUI> ();
+			conf.init (config_list[i], config_list, this);
+		}
 	}
 
     void initGroups()

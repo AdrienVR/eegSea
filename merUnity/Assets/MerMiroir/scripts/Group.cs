@@ -4,12 +4,32 @@ using System.Collections.Generic;
 
 public class Group 
 {
+	private string name;
 	private List<int> electrodes;
 	private int F_min, F_max;
 
-	public Group (List<int> elecs, int f1, int f2)
+	static Dictionary<int, string> ElecNames = new Dictionary<int, string>
 	{
-		electrodes = elecs;
+		{1, "O2"},
+		{2, "P8"},
+		{3, "T8"},
+		{4, "FC6"},
+		{5, "F8"},
+		{6, "F4"},
+		{7, "AF4"},
+		{8, "AF3"},
+		{9, "F3"},
+		{10, "F7"},
+		{11, "FC5"},
+		{12, "T7"},
+		{13, "P7"},
+		{14, "O1"}
+	};
+
+	public Group (string n, List<int> elecs, int f1, int f2)
+	{
+		name = n;
+		electrodes = new List<int>(elecs);
 		F_min = Mathf.Min (f1, f2);
 		F_max = Mathf.Max (f1, f2);
 	}
@@ -18,6 +38,11 @@ public class Group
 	public int getFMin()
 	{
 		return F_min;
+	}
+
+	public string getName()
+	{
+		return name;
 	}
 	
 	public int getFMax()
@@ -32,18 +57,18 @@ public class Group
 
 	public string getText()
 	{
-		string eText = "-";
+		string eText = "";
 		bool first = true;
 		foreach (int e in electrodes)
 		{
 			if(!first)
-				eText+=", "+e.ToString();
+				eText+=", "+ElecNames[e];
 			else
-				eText+=e.ToString();
+				eText+=ElecNames[e];
 			first=false;
 		}
-		string fText = "- ("+F_min.ToString () + " Hz->" + F_max.ToString () + " Hz)";
-		return eText + fText;
+		string fText = "("+F_min.ToString () + " Hz->" + F_max.ToString () + " Hz)";
+		return getName().ToUpper()+"\n"+ eText + "\n" + fText;
 	}
 
 

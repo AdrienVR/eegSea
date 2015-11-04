@@ -17,7 +17,7 @@ public class SkullMenu : MonoBehaviour
 	public List<Group> config_list;
     string path = "Assets/MerMiroir/Config/groups.txt";
 	string pathFreqs = "Assets/MerMiroir/Config/freqs.txt";
-	
+
 	// Use this for initialization
     void Start()
     {
@@ -62,7 +62,7 @@ public class SkullMenu : MonoBehaviour
 		freq_m.GetComponent<InputField> ().text = freqs [nb][0].ToString();
 		freq_M.GetComponent<InputField> ().text = freqs [nb][1].ToString();
 	}
-	
+
 	// Callback function for plus button
 	public void displayAddUI()
 	{
@@ -77,7 +77,7 @@ public class SkullMenu : MonoBehaviour
 	{
 		addUI2.SetActive(true);
 	}
-	
+
 	public void hideAddUI2()
 	{
 		addUI2.SetActive(false);
@@ -96,7 +96,7 @@ public class SkullMenu : MonoBehaviour
 	{
 		dialog2.SetActive(true);
 	}
-	
+
 	public void hideDialog2()
 	{
 		dialog2.SetActive(false);
@@ -105,7 +105,7 @@ public class SkullMenu : MonoBehaviour
 	{
 		dialog3.SetActive(true);
 	}
-	
+
 	public void hideDialog3()
 	{
 		dialog3.SetActive(false);
@@ -200,7 +200,9 @@ public class SkullMenu : MonoBehaviour
         sw.Write(sentence);
         sw.Close();
         initGroups();
+#if UNITY_5_2
         dropdown.GetComponent<Dropdown>().value = groups.Count;
+#endif
     }
 
 	public void saveFrequence()
@@ -215,7 +217,9 @@ public class SkullMenu : MonoBehaviour
 		sw.Write(sentence);
 		sw.Close();
 		initGroups();
+#if UNITY_5_2
 		dropdown2.GetComponent<Dropdown>().value = freqs.Count;
+#endif
 	}
 
 	public void addConfig()
@@ -278,6 +282,7 @@ public class SkullMenu : MonoBehaviour
     // Function used to get the groups that are saved into the config file
     bool getGroups()
     {
+#if UNITY_5_2
         bool state = true;
         if (File.Exists(path))
         {
@@ -314,12 +319,16 @@ public class SkullMenu : MonoBehaviour
             Debug.LogError("Cannot open file : " + path);
         }
         return state;
+#else
+    return false;
+#endif
     }
 
 
 	// Function used to get the frequences that are saved into the config file
 	bool getFreqs()
 	{
+#if UNITY_5_2
 		bool state = true;
 		if (File.Exists(pathFreqs))
 		{
@@ -356,8 +365,11 @@ public class SkullMenu : MonoBehaviour
 			Debug.LogError("Cannot open file : " + path);
 		}
 		return state;
+#else
+    return false;
+#endif
 	}
-	
+
 	void switchOn(int i)
 	{
 		Toggle t = (Toggle) Toggles[i].GetComponent<Toggle>();
@@ -368,5 +380,5 @@ public class SkullMenu : MonoBehaviour
 		Toggle t = (Toggle)Toggles[i].GetComponent<Toggle>();
 		t.isOn = false;
 	}
-	
+
 }

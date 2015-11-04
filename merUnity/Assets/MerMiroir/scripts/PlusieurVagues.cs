@@ -7,6 +7,8 @@ using System;
 
 public class PlusieurVagues : MonoBehaviour
 {
+
+    public SeaManager SeaManager;
     //les vagues filles de cet objet sont crees a partir du tableau parametresVagues
     //elles servent pour les objets qui flottent et qui vont venir interroger le calculImage qui va bien pour eux
     //le tableau de parametresVagues sert egalement pour mettre a jour le tableau correspondant dans le shader de vagues
@@ -34,20 +36,7 @@ public class PlusieurVagues : MonoBehaviour
     float memAlphaRadius;
     float memAlphaTHF;
 
-    [Serializable]
-    public class ParametresVague
-    {
-        public float angle; //radians
-        public float period; //seconds
-        public float waveLenght; //meters
-        public float radius; //meters
-        public string position;
-        public string frequence;
-        public float radiusMax;
-        public float density;
-        public float advance;
-    };
-    public ParametresVague[] parametresVagues = new ParametresVague[8];
+    public WaveParameter[] parametresVagues = new WaveParameter[8];
 
     Vague[] vagues;
     //PerlinVague[] perlinVagues;
@@ -118,56 +107,6 @@ public class PlusieurVagues : MonoBehaviour
         tangentX.Normalize();
     }
 
-    void setShaderWaveParameters(Material material, int i, ParametresVague parametres)
-    {
-        string propertyName = "_Wave" + (i + 1).ToString() + "Parameters";
-        if (material.HasProperty(propertyName))
-        {
-            Vector4 propertyValue = new Vector4(parametres.angle * Mathf.Deg2Rad,
-                                                parametres.radius,
-                                                parametres.period,
-                                                parametres.waveLenght);
-            material.SetVector(propertyName, propertyValue);
-        }
-        propertyName = "_Wave" + (i + 1).ToString() + "GroupParam"; // OK for seaShader version 4
-        if (material.HasProperty(propertyName))
-        {
-            Vector4 propValue = new Vector4(parametres.density, parametres.advance);
-            material.SetVector(propertyName, propValue);
-        }
-        propertyName = "_Wave" + (i + 1).ToString() + "density"; // OK for seaShader version 3
-        if (material.HasProperty(propertyName))
-        {
-            float density = parametres.density;
-            material.SetFloat(propertyName, density);
-        }
-        propertyName = "_Wave" + (i + 1).ToString() + "advance"; // OK for seaShader version 3
-        if (material.HasProperty(propertyName))
-        {
-            float advance = parametres.advance;
-            material.SetFloat(propertyName, advance);
-        }
-
-
-    }
-    void setShaderCoefParameters(Material material, float coef, string i)
-    {
-        string propertyName = "_coefHF" + i;
-        if (material.HasProperty(propertyName))
-        {
-            material.SetFloat(propertyName, coef);
-        }
-    }
-
-    void setShaderCoeffsParameters(Material material, Vector4 coeffs)
-    {
-        string propertyName = "_coeffsHF";
-        if (material.HasProperty(propertyName))
-        {
-            material.SetVector(propertyName, coeffs);
-        }
-    }
-
     // Use this for initialization
     Vague vague;
 
@@ -176,16 +115,12 @@ public class PlusieurVagues : MonoBehaviour
         //		perlinVagues = gameObject.GetComponentsInChildren<PerlinVague>();
         EEGDataManager.Instance.Initialize(alphaRadius, alphaTHF); //Appeler init une seulf fois dans le programme	//Given param: alpha radius & alpha THF
 
-        Material targetMaterial = targetGameObject.GetComponent<Renderer>().material;
-        if (targetMaterial.HasProperty("_WavesAmount"))
-        {
-            targetMaterial.SetFloat("_WavesAmount", amount);
-        }
-        if (targetMaterial.HasProperty("_windDir")) targetMaterial.SetFloat("_windDir", windDir * Mathf.Deg2Rad);
+        SeaManager.SetAmount(amount);
+        SeaManager.SetWind(windDir);
 
         for (int i = 0; i < Mathf.Min(parametresVagues.Length, numberOfWavesToUse); ++i)
         {
-            ParametresVague parametres = parametresVagues[i];
+            WaveParameter parametres = parametresVagues[i];
             //new child vague game object
             vague = Instantiate(prefabVague, Vector3.zero, Quaternion.identity) as Vague;
             vague.transform.Rotate(Vector3.up * parametres.angle);
@@ -200,7 +135,7 @@ public class PlusieurVagues : MonoBehaviour
             if (parametres.advance < 0) parametres.advance = 0;
             vague.advance = parametres.advance;
             vague.transform.parent = transform;
-            setShaderWaveParameters(targetMaterial, i, parametres);
+            SeaManager.SetShaderWaveParameters(i, parametres);
         }
         vagues = gameObject.GetComponentsInChildren<Vague>();
     }
@@ -223,9 +158,8 @@ public class PlusieurVagues : MonoBehaviour
 
         EEGDataManager.Instance.MAJmoyenneEcartType(Time.deltaTime, TMoyenneBasse, TMoyenneHaute, TMoyenneTheta, TMoyenneTHF, TEcartTypeBasse, TEcartTypeHaute, TEcartTypeTheta, TEcartTypeTHF);
 
-        Material targetMaterial = targetGameObject.GetComponent<Renderer>().material;
-        if (targetMaterial.HasProperty("_WavesAmount")) targetMaterial.SetFloat("_WavesAmount", amount);
-        if (targetMaterial.HasProperty("_windDir")) targetMaterial.SetFloat("_windDir", windDir * Mathf.Deg2Rad);
+        SeaManager.SetAmount(amount);
+        SeaManager.SetWind(windDir);
 
         //change les coefs des vagues hautes fréquences (texture)
         EEGDataManager.Instance.calculTHF(maxTHF);
@@ -236,12 +170,12 @@ public class PlusieurVagues : MonoBehaviour
         thfs.x = Mathf.Max(thfs.y, Mathf.Max(thfs.z, thfs.w));
         thfs.y *= 1f / maxTHF; thfs.z *= 0.75f / maxTHF; thfs.w *= 0.5f / maxTHF;
         // for the shader version 3
-        setShaderCoefParameters(targetMaterial, thfs.x, "");
-        setShaderCoefParameters(targetMaterial, thfs.y, "1");
-        setShaderCoefParameters(targetMaterial, thfs.z, "2");
-        setShaderCoefParameters(targetMaterial, thfs.w, "3");
+        SeaManager.SetShaderCoefParameters(thfs.x, "");
+        SeaManager.SetShaderCoefParameters(thfs.y, "1");
+        SeaManager.SetShaderCoefParameters(thfs.z, "2");
+        SeaManager.SetShaderCoefParameters(thfs.w, "3");
         // for the shader version 4
-        setShaderCoeffsParameters(targetMaterial, thfs);
+        SeaManager.SetShaderCoeffsParameters(thfs);
 
         EEGDataManager.Instance.calculRadius();
         for (int i = 0; i < parametresVagues.Length; i++)
@@ -254,7 +188,7 @@ public class PlusieurVagues : MonoBehaviour
 
         for (int i = 0; i < Mathf.Min(parametresVagues.Length, numberOfWavesToUse); ++i)
         {
-            setShaderWaveParameters(targetMaterial, i, parametresVagues[i]);
+            SeaManager.SetShaderWaveParameters(i, parametresVagues[i]);
             vagues[i].radius = parametresVagues[i].radius;
         }
         //Client.displayValues();

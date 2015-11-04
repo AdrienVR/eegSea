@@ -8,7 +8,7 @@ public class Group
 	private List<int> electrodes;
 	private int F_min, F_max;
 
-	static Dictionary<int, string> ElecNames = new Dictionary<int, string>
+	public static Dictionary<int, string> ElecNames = new Dictionary<int, string>
 	{
 		{1, "O2"},
 		{2, "P8"},

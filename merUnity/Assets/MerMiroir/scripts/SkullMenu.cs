@@ -139,11 +139,30 @@ public class SkullMenu : MonoBehaviour
 
 	public void Valid()
 	{
+		// Ecriture du fichier XML correspondant
+		string path = "Assets/MerMiroir/Config/config" + System.DateTime.Now.ToString ().Replace ('/', '_').Replace (' ', '_').Replace (':', '_') + ".xml";
+		XmlWriter writer = new XmlWriter (path);
+		writer.WriteStartDocument ();
+		writer.WriteStartElement ("config");
+			foreach(Group g in config_list)
+			{
+				writer.WriteStartElement ("group");
+					writer.WriteElementString("name", g.getName());
+					writer.WriteElementString("f_min", g.getFMin().ToString());
+					writer.WriteElementString("f_max", g.getFMax().ToString());
+					writer.WriteStartElement ("electrodes_list");
+						foreach(int e in g.getElecs())
+						{
+							writer.WriteElementString("electrode", Group.ElecNames[e]);
+						}
+					writer.WriteEndElement("electrodes_list");
+				writer.WriteEndElement("group");
+			}
+		writer.WriteEndElement("config");
+		writer.WriteEndDocument ();
+		// fin de l'application
 		Application.Quit ();
-		foreach (Group g in config_list)
-		{
-			Debug.Log (g.getText());
-		}
+		Debug.Log ("The configuration have been correctly exported to XML file.");
 	}
 
     // Callback function for Add button

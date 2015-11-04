@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.IO;
-using System.Text;
 
 public class SkullMenu : MonoBehaviour
 {
@@ -219,7 +217,9 @@ public class SkullMenu : MonoBehaviour
         sw.Write(sentence);
         sw.Close();
         initGroups();
+#if UNITY_5_2
         dropdown.GetComponent<Dropdown>().value = groups.Count;
+#endif
     }
 
 	public void saveFrequence()
@@ -234,10 +234,12 @@ public class SkullMenu : MonoBehaviour
 		sw.Write(sentence);
 		sw.Close();
 		initGroups();
-		dropdown2.GetComponent<Dropdown>().value = freqs.Count;
-	}
+#if UNITY_5_2
+        dropdown2.GetComponent<Dropdown>().value = freqs.Count;
+#endif
+    }
 
-	public void addConfig()
+    public void addConfig()
 	{
 		if (config_list.Count < 8)
 		{
@@ -297,6 +299,7 @@ public class SkullMenu : MonoBehaviour
     // Function used to get the groups that are saved into the config file
     bool getGroups()
     {
+#if UNITY_5_2
         bool state = true;
         if (File.Exists(path))
         {
@@ -333,13 +336,17 @@ public class SkullMenu : MonoBehaviour
             Debug.LogError("Cannot open file : " + path);
         }
         return state;
+#else
+        return false;
+#endif
     }
 
 
-	// Function used to get the frequences that are saved into the config file
-	bool getFreqs()
-	{
-		bool state = true;
+    // Function used to get the frequences that are saved into the config file
+    bool getFreqs()
+    {
+#if UNITY_5_2
+        bool state = true;
 		if (File.Exists(pathFreqs))
 		{
 			try
@@ -375,9 +382,12 @@ public class SkullMenu : MonoBehaviour
 			Debug.LogError("Cannot open file : " + path);
 		}
 		return state;
-	}
-	
-	void switchOn(int i)
+#else
+        return false;
+#endif
+    }
+
+    void switchOn(int i)
 	{
 		Toggle t = (Toggle) Toggles[i].GetComponent<Toggle>();
 		t.isOn = true;

@@ -1,1 +1,1 @@
-python readDataEEGclientUDPandOSC.py
+python geneSinusUDP.py

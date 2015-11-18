@@ -30,99 +30,6 @@ public class EEGDataManager : MonoBehaviour
         }
     }
 
-
-    void InitGroups()
-    {
-        string[] listOfXMLFiles = Directory.GetFiles("Assets/MerMiroir/Config/", "*.xml");
-
-        int index = 0;
-
-        foreach (string path in listOfXMLFiles)
-        {
-            XmlDocument xmlDoc = new XmlDocument(); // xmlDoc is the new xml document.
-            string content = System.IO.File.ReadAllText(path);
-            xmlDoc.LoadXml(content);
-            XmlNodeList levelsList = xmlDoc.GetElementsByTagName("group"); // array of the level nodes.
-            foreach (XmlNode levelInfo in levelsList)
-            {
-                string name = "error";
-                string f_min = "error";
-                string f_max = "error";
-                List<string> electrodes = new List<string>();
-                XmlNodeList levelcontent = levelInfo.ChildNodes;
-                foreach (XmlNode levelsItems in levelcontent)
-                {
-                    if (levelsItems.Name == "name")
-                    {
-                        name = levelsItems.InnerText;
-                    }
-                    else if (levelsItems.Name == "f_min")
-                    {
-                        f_min = levelsItems.InnerText;
-                    }
-                    else if (levelsItems.Name == "f_max")
-                    {
-                        f_max = levelsItems.InnerText;
-                    }
-                    else if (levelsItems.Name == "electrodes_list")
-                    {
-                        XmlNodeList subLevelcontent = levelsItems.ChildNodes;
-                        foreach (XmlNode subLevelsItems in subLevelcontent)
-                        {
-                            if (subLevelsItems.Name == "electrode")
-                            {
-                                electrodes.Add(subLevelsItems.InnerText);
-                            }
-                            else
-                            {
-                                Debug.LogError("ERROR : invalid content in Xml file, marke '" + subLevelsItems.Name + "' have been found");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError("ERROR : invalid content in Xml file, marke '" + levelsItems.Name + "' have been found");
-                    }
-                }
-                List<int> elecsInt = new List<int>();
-                foreach (string s in electrodes)
-                {
-                    elecsInt.Add(reverseDict(Group.ElecNames)[s]);
-                }
-                Group g = new Group(name, elecsInt, int.Parse(f_min), int.Parse(f_max));
-                Debug.Log("Import group : " + g.getText());
-                m_electrodeGroups[index] = g;
-                /*
-				Debug.Log ("__________________________");
-				Debug.Log ("name is "+name);
-				Debug.Log ("f_min is "+f_min);
-				Debug.Log ("f_max is "+f_max);
-				Debug.Log("electrodes :");
-				foreach(String s in electrodes)
-				{
-					Debug.Log ("elec is "+s);
-				}
-				*/
-            }
-        }
-
-    }
-
-    Dictionary<string, int> reverseDict(Dictionary<int, string> input)
-    {
-        Dictionary<string, int> output = new Dictionary<string, int>();
-        foreach (int i in input.Keys)
-        {
-            output.Add(input[i], i);
-        }
-        return output;
-    }
-
-	public float[] GetFT()
-	{
-		return m_transFourrier.GetFT();
-	}
-
 	public void UpdateValues(double[] sensorVal)
     {
 		m_transFourrier.addSample(sensorVal);
@@ -535,6 +442,100 @@ public class EEGDataManager : MonoBehaviour
             if (ecartType != 0) return (valMin + valMax) / 2f + (valMax - valMin) * (valCapteur - moyenne) / (ecartType * 2f * tolerance);
         }
         return (valMin + valMax) / 2f;
+    }
+
+
+
+    void InitGroups()
+    {
+        string[] listOfXMLFiles = Directory.GetFiles("Assets/MerMiroir/Config/", "*.xml");
+
+        int index = 0;
+
+        foreach (string path in listOfXMLFiles)
+        {
+            XmlDocument xmlDoc = new XmlDocument(); // xmlDoc is the new xml document.
+            string content = System.IO.File.ReadAllText(path);
+            xmlDoc.LoadXml(content);
+            XmlNodeList levelsList = xmlDoc.GetElementsByTagName("group"); // array of the level nodes.
+            foreach (XmlNode levelInfo in levelsList)
+            {
+                string name = "error";
+                string f_min = "error";
+                string f_max = "error";
+                List<string> electrodes = new List<string>();
+                XmlNodeList levelcontent = levelInfo.ChildNodes;
+                foreach (XmlNode levelsItems in levelcontent)
+                {
+                    if (levelsItems.Name == "name")
+                    {
+                        name = levelsItems.InnerText;
+                    }
+                    else if (levelsItems.Name == "f_min")
+                    {
+                        f_min = levelsItems.InnerText;
+                    }
+                    else if (levelsItems.Name == "f_max")
+                    {
+                        f_max = levelsItems.InnerText;
+                    }
+                    else if (levelsItems.Name == "electrodes_list")
+                    {
+                        XmlNodeList subLevelcontent = levelsItems.ChildNodes;
+                        foreach (XmlNode subLevelsItems in subLevelcontent)
+                        {
+                            if (subLevelsItems.Name == "electrode")
+                            {
+                                electrodes.Add(subLevelsItems.InnerText);
+                            }
+                            else
+                            {
+                                Debug.LogError("ERROR : invalid content in Xml file, marke '" + subLevelsItems.Name + "' have been found");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("ERROR : invalid content in Xml file, marke '" + levelsItems.Name + "' have been found");
+                    }
+                }
+                List<int> elecsInt = new List<int>();
+                foreach (string s in electrodes)
+                {
+                    elecsInt.Add(reverseDict(Group.ElecNames)[s]);
+                }
+                Group g = new Group(name, elecsInt, int.Parse(f_min), int.Parse(f_max));
+                Debug.Log("Import group : " + g.getText());
+                m_electrodeGroups[index] = g;
+                /*
+				Debug.Log ("__________________________");
+				Debug.Log ("name is "+name);
+				Debug.Log ("f_min is "+f_min);
+				Debug.Log ("f_max is "+f_max);
+				Debug.Log("electrodes :");
+				foreach(String s in electrodes)
+				{
+					Debug.Log ("elec is "+s);
+				}
+				*/
+            }
+        }
+
+    }
+
+    Dictionary<string, int> reverseDict(Dictionary<int, string> input)
+    {
+        Dictionary<string, int> output = new Dictionary<string, int>();
+        foreach (int i in input.Keys)
+        {
+            output.Add(input[i], i);
+        }
+        return output;
+    }
+
+    public float[] GetFT()
+    {
+        return m_transFourrier.GetFT();
     }
 
     private float[] basseFrequence = new float[4];

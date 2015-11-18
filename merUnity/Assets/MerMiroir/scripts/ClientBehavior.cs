@@ -58,7 +58,7 @@ public class ClientBehavior : MonoBehaviour
     {
         double dateRunProgram = (GetRealTime() - timestampStartProgram);
         Debug.Log("Client have ran for " + dateRunProgram + "seconds and have received " + numberValuesReceived + "dataValues within this time!");
-        double frequency = numberValuesReceived / (dateRunProgram);
+        double frequency = dateRunProgram != 0 ? numberValuesReceived / (dateRunProgram) : 0;
         Debug.Log("Approximate frequency : " + frequency + " Values/seconds");
 
         if (m_receiveThread != null)

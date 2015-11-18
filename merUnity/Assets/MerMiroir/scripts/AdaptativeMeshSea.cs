@@ -80,7 +80,8 @@ public class AdaptativeMeshSea : MonoBehaviour {
 		mesh.uv = uv;
 		mesh.triangles = triangles;
 
-	}
+        m_renderer = GetComponent<Renderer>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -96,19 +97,19 @@ public class AdaptativeMeshSea : MonoBehaviour {
 			Debug.DrawLine (hautDroite, basDroite, Color.magenta);
 			Debug.DrawLine (basDroite, basGauche, Color.magenta);
 
-			if (GetComponent<Renderer>().material.HasProperty("_LeftBottom"))
+			if (m_renderer.material.HasProperty("_LeftBottom"))
 			{
-				GetComponent<Renderer>().material.SetVector("_LeftBottom",new Vector4(basGauche.x,basGauche.y,basGauche.z,1.0f));
+				m_renderer.material.SetVector("_LeftBottom",new Vector4(basGauche.x,basGauche.y,basGauche.z,1.0f));
 			}
-			if (GetComponent<Renderer>().material.HasProperty("_LeftRight"))
+			if (m_renderer.material.HasProperty("_LeftRight"))
 			{
 				Vector3 gaucheDroite = basDroite - basGauche;
-				GetComponent<Renderer>().material.SetVector("_LeftRight",new Vector4(gaucheDroite.x,gaucheDroite.y,gaucheDroite.z,0.0f));
+				m_renderer.material.SetVector("_LeftRight",new Vector4(gaucheDroite.x,gaucheDroite.y,gaucheDroite.z,0.0f));
 			}
-			if (GetComponent<Renderer>().material.HasProperty("_BottomTop"))
+			if (m_renderer.material.HasProperty("_BottomTop"))
 			{
 				Vector3 basHaut = hautGauche - basGauche;
-				GetComponent<Renderer>().material.SetVector("_BottomTop",new Vector4(basHaut.x,basHaut.y,basHaut.z,1.0f));
+				m_renderer.material.SetVector("_BottomTop",new Vector4(basHaut.x,basHaut.y,basHaut.z,1.0f));
 			}
 			/* Tout ceci se retrouve dans seaSurface2Shader
 			 * 
@@ -155,7 +156,7 @@ public class AdaptativeMeshSea : MonoBehaviour {
 			*/
 
 			//mesh.RecalculateBounds();  may not work because of the vertex shader
-			MeshFilter meshFilter = GetComponent<Renderer>().GetComponent<MeshFilter>();
+			MeshFilter meshFilter = m_renderer.GetComponent<MeshFilter>();
 			meshFilter.sharedMesh.bounds = new Bounds (
 				Camera.main.transform.position, 
 				Vector3.one * Camera.main.farClipPlane);
@@ -288,4 +289,6 @@ public class AdaptativeMeshSea : MonoBehaviour {
 			Debug.DrawLine (basDroite, basGauche, Color.magenta);
 		}		
 	}
+
+    private Renderer m_renderer;
 }

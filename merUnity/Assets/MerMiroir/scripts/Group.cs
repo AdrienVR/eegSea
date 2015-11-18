@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Group 
+public class Group : WaveDescriptor
 {
 	private string name;
 	private List<int> electrodes;
@@ -33,6 +33,11 @@ public class Group
 		F_min = Mathf.Min (f1, f2);
 		F_max = Mathf.Max (f1, f2);
 	}
+
+    public override void UpdateRadius(float[] frequencies, float[] amplitudes)
+    {
+        m_radius = 0;//CenterValue(moyenneBasse[i], ecartTypeBasse[i], 0f, 1f, basseFrequence[i], 2f);
+    }
 
 	// ACCESSEURS
 	public int getFMin()

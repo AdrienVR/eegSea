@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using System;
 
-public class SeaManager : MonoBehaviour
+public class SeaManager : WaveListener
 {
     public MeshRenderer SeaRenderer;
+    public WaveParameter[] WaveParameters;
 
-	// Use this for initialization
-	void Awake ()
+    public float AlphaRadius;
+
+    // Use this for initialization
+    void Awake ()
     {
         m_seaMaterial = SeaRenderer.material;
         if (m_seaMaterial.HasProperty("_WavesAmount") == false ||
@@ -16,14 +19,23 @@ public class SeaManager : MonoBehaviour
             gameObject.SetActive(false);
         }
     }
-	
-	// Update is called once per frame
-	void Update ()
-    {
 
+    // Update is called once per frame
+    void Update()
+    {
+        for (int i = 0; i < WaveParameters.Length; ++i)
+        {
+            WaveParameter waveParameter = WaveParameters[i];
+            float r = m_waveDescriptors[i].GetRadius();
+            float alpha = Mathf.Min(1, Time.deltaTime / (AlphaRadius * waveParameter.period));
+            waveParameter.radius *= (1 - alpha);
+            waveParameter.radius += alpha * r;
+            SetWaveParameters(i, waveParameter);
+            //m_waveDescriptors[i].UpdateRadius();// = waveParameter.radius;
+        }
     }
 
-    public void SetShaderWaveParameters(int i, WaveParameter parametres)
+    public void SetWaveParameters(int i, WaveParameter parametres)
     {
         string propertyName = "_Wave" + (i + 1).ToString() + "Parameters";
         if (m_seaMaterial.HasProperty(propertyName))
@@ -55,7 +67,9 @@ public class SeaManager : MonoBehaviour
 
 
     }
-    public void SetShaderCoefParameters(float coef, string i)
+
+    // Shader Version 3
+    public void SetCoefHF(float coef, string i)
     {
         string propertyName = "_coefHF" + i;
         if (m_seaMaterial.HasProperty(propertyName))
@@ -64,7 +78,8 @@ public class SeaManager : MonoBehaviour
         }
     }
 
-    public void SetShaderCoeffsParameters(Vector4 coeffs)
+    // Shader Version 4
+    public void SetCoeffsHF(Vector4 coeffs)
     {
         string propertyName = "_coeffsHF";
         if (m_seaMaterial.HasProperty(propertyName))
@@ -73,15 +88,22 @@ public class SeaManager : MonoBehaviour
         }
     }
 
-    public void SetAmount(float amount)
+    public void SetWavesAmount(float amount)
     {
         if (m_seaMaterial.HasProperty("_WavesAmount")) m_seaMaterial.SetFloat("_WavesAmount", amount);
     }
 
-    public void SetWind(float windDir)
+    public void SetWindDirection(float windDir)
     {
         if (m_seaMaterial.HasProperty("_windDir")) m_seaMaterial.SetFloat("_windDir", windDir * Mathf.Deg2Rad);
     }
+
+    public override void SetWave(WaveDescriptor[] waveDescriptors)
+    {
+        m_waveDescriptors = waveDescriptors;
+    }
+
+    private WaveDescriptor[] m_waveDescriptors;
 
     private Material m_seaMaterial;
 }

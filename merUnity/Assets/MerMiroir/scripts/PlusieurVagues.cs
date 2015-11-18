@@ -7,7 +7,7 @@ using System.Xml;
 using System.Text;
 using System.Collections.Generic;
 
-public class PlusieurVagues : MonoBehaviour
+public class PlusieurVagues : WaveListener
 {
 
     public SeaManager SeaManager;
@@ -47,6 +47,14 @@ public class PlusieurVagues : MonoBehaviour
     public GameObject targetGameObject;
 
     public int numberOfWavesToUse = 8;
+
+
+    public override void SetWave(WaveDescriptor[] waveDescriptors)
+    {
+        m_waveDescriptors = waveDescriptors;
+    }
+
+    private WaveDescriptor[] m_waveDescriptors;
 
     public Vector3 CalculeImage(Vector3 startPoint)
     {
@@ -111,19 +119,15 @@ public class PlusieurVagues : MonoBehaviour
 
     // Use this for initialization
     Vague vague;
-	List<Group> configs;
 
     void Start()
     {
-		// Initialisation des groupes depuis les fichiers .xml
-		configs = new List<Group> ();
-		InitGroups ();
 
         //		perlinVagues = gameObject.GetComponentsInChildren<PerlinVague>();
         EEGDataManager.Instance.Initialize(alphaRadius, alphaTHF); //Appeler init une seulf fois dans le programme	//Given param: alpha radius & alpha THF
 
-        SeaManager.SetAmount(amount);
-        SeaManager.SetWind(windDir);
+        SeaManager.SetWavesAmount(amount);
+        SeaManager.SetWindDirection(windDir);
 
         for (int i = 0; i < Mathf.Min(parametresVagues.Length, numberOfWavesToUse); ++i)
         {
@@ -142,7 +146,7 @@ public class PlusieurVagues : MonoBehaviour
             if (parametres.advance < 0) parametres.advance = 0;
             vague.advance = parametres.advance;
             vague.transform.parent = transform;
-            SeaManager.SetShaderWaveParameters(i, parametres);
+            SeaManager.SetWaveParameters(i, parametres);
         }
         vagues = gameObject.GetComponentsInChildren<Vague>();
     }
@@ -165,8 +169,8 @@ public class PlusieurVagues : MonoBehaviour
 
         EEGDataManager.Instance.MAJmoyenneEcartType(Time.deltaTime, TMoyenneBasse, TMoyenneHaute, TMoyenneTheta, TMoyenneTHF, TEcartTypeBasse, TEcartTypeHaute, TEcartTypeTheta, TEcartTypeTHF);
 
-        SeaManager.SetAmount(amount);
-        SeaManager.SetWind(windDir);
+        SeaManager.SetWavesAmount(amount);
+        SeaManager.SetWindDirection(windDir);
 
         //change les coefs des vagues hautes fréquences (texture)
         EEGDataManager.Instance.calculTHF(maxTHF);
@@ -177,27 +181,13 @@ public class PlusieurVagues : MonoBehaviour
         thfs.x = Mathf.Max(thfs.y, Mathf.Max(thfs.z, thfs.w));
         thfs.y *= 1f / maxTHF; thfs.z *= 0.75f / maxTHF; thfs.w *= 0.5f / maxTHF;
         // for the shader version 3
-        SeaManager.SetShaderCoefParameters(thfs.x, "");
-        SeaManager.SetShaderCoefParameters(thfs.y, "1");
-        SeaManager.SetShaderCoefParameters(thfs.z, "2");
-        SeaManager.SetShaderCoefParameters(thfs.w, "3");
+        SeaManager.SetCoefHF(thfs.x, "");
+        SeaManager.SetCoefHF(thfs.y, "1");
+        SeaManager.SetCoefHF(thfs.z, "2");
+        SeaManager.SetCoefHF(thfs.w, "3");
         // for the shader version 4
-        SeaManager.SetShaderCoeffsParameters(thfs);
-
-        EEGDataManager.Instance.calculRadius();
-        for (int i = 0; i < parametresVagues.Length; i++)
-        {
-            float r = EEGDataManager.Instance.GetRadius(parametresVagues[i].frequence, parametresVagues[i].position) * parametresVagues[i].radiusMax;
-            float alpha = Mathf.Min(1, Time.deltaTime / (alphaRadius * parametresVagues[i].period));
-            parametresVagues[i].radius *= (1 - alpha);
-            parametresVagues[i].radius += alpha * r;
-        }
-
-        for (int i = 0; i < Mathf.Min(parametresVagues.Length, numberOfWavesToUse); ++i)
-        {
-            SeaManager.SetShaderWaveParameters(i, parametresVagues[i]);
-            vagues[i].radius = parametresVagues[i].radius;
-        }
+        SeaManager.SetCoeffsHF(thfs);
+        
         //Client.displayValues();
     }
 
@@ -205,90 +195,5 @@ public class PlusieurVagues : MonoBehaviour
     {
         ClientBehavior.Instance.Disable();
     }
-
-	void InitGroups()
-	{
-		string[] listOfXMLFiles = Directory.GetFiles ("Assets/MerMiroir/Config/","*.xml");
-
-		foreach(string path in listOfXMLFiles)
-		{
-			XmlDocument xmlDoc = new XmlDocument(); // xmlDoc is the new xml document.
-			string content = System.IO.File.ReadAllText(path);
-			xmlDoc.LoadXml(content);
-			XmlNodeList levelsList = xmlDoc.GetElementsByTagName("group"); // array of the level nodes.
-			foreach (XmlNode levelInfo in levelsList)
-			{
-				String name="error";
-				String f_min="error";
-				String f_max="error";
-				List<String> electrodes = new List<String>();  
-				XmlNodeList levelcontent = levelInfo.ChildNodes;
-				foreach(XmlNode levelsItems in levelcontent)
-				{
-					if(levelsItems.Name == "name")
-					{
-						name = levelsItems.InnerText;
-					}
-					else if(levelsItems.Name == "f_min")
-					{
-						f_min = levelsItems.InnerText;
-					}
-					else if(levelsItems.Name == "f_max")
-					{
-						f_max = levelsItems.InnerText;
-					}
-					else if(levelsItems.Name == "electrodes_list")
-					{
-						XmlNodeList subLevelcontent = levelsItems.ChildNodes;
-						foreach(XmlNode subLevelsItems in subLevelcontent)
-						{
-							if(subLevelsItems.Name == "electrode")
-							{
-								electrodes.Add (subLevelsItems.InnerText);
-							}
-							else
-							{
-								Debug.LogError("ERROR : invalid content in Xml file, marke '" + subLevelsItems.Name + "' have been found");
-							}
-						}
-					}
-					else
-					{
-						Debug.LogError("ERROR : invalid content in Xml file, marke '" + levelsItems.Name + "' have been found");
-					}
-				}
-				List<int> elecsInt = new List<int>();
-				foreach(string s in electrodes)
-				{
-					elecsInt.Add(reverseDict(Group.ElecNames)[s]);
-				}
-				Group g = new Group(name,elecsInt,int.Parse(f_min),int.Parse (f_max));
-				Debug.Log("Import group : "+g.getText());
-				configs.Add (g);
-				/*
-				Debug.Log ("__________________________");
-				Debug.Log ("name is "+name);
-				Debug.Log ("f_min is "+f_min);
-				Debug.Log ("f_max is "+f_max);
-				Debug.Log("electrodes :");
-				foreach(String s in electrodes)
-				{
-					Debug.Log ("elec is "+s);
-				}
-				*/
-			}
-		}
-
-	}
-
-	Dictionary<string, int> reverseDict(Dictionary<int, string> input)
-	{
-		Dictionary<string, int> output = new Dictionary<string, int> ();
-		foreach (int i in input.Keys)
-		{
-			output.Add(input[i],i);
-		}
-		return output;
-	}
 
 }

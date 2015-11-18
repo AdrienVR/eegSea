@@ -1,21 +1,131 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Globalization;
+using System.Collections.Generic;
+using System.IO;
+using System.Xml;
 
-public class EEGDataManager
+public class EEGDataManager : MonoBehaviour
 {
     // Singleton
     public static EEGDataManager Instance;
 
+    public WaveListener[] WaveListeners;
+
     public float Delta { get { return maxGD - minGD; } }
 
-    public EEGDataManager()
+    void Awake()
     {
         Instance = this;
     }
 
-    public void Update(string[] splitValues)
+    void Start()
     {
+        // Initialisation des groupes depuis les fichiers .xml
+        InitGroups();
+        foreach(WaveListener waveListener in WaveListeners)
+        {
+            waveListener.SetWave(m_electrodeGroups);
+        }
+    }
+
+
+    void InitGroups()
+    {
+        string[] listOfXMLFiles = Directory.GetFiles("Assets/MerMiroir/Config/", "*.xml");
+
+        int index = 0;
+
+        foreach (string path in listOfXMLFiles)
+        {
+            XmlDocument xmlDoc = new XmlDocument(); // xmlDoc is the new xml document.
+            string content = System.IO.File.ReadAllText(path);
+            xmlDoc.LoadXml(content);
+            XmlNodeList levelsList = xmlDoc.GetElementsByTagName("group"); // array of the level nodes.
+            foreach (XmlNode levelInfo in levelsList)
+            {
+                string name = "error";
+                string f_min = "error";
+                string f_max = "error";
+                List<string> electrodes = new List<string>();
+                XmlNodeList levelcontent = levelInfo.ChildNodes;
+                foreach (XmlNode levelsItems in levelcontent)
+                {
+                    if (levelsItems.Name == "name")
+                    {
+                        name = levelsItems.InnerText;
+                    }
+                    else if (levelsItems.Name == "f_min")
+                    {
+                        f_min = levelsItems.InnerText;
+                    }
+                    else if (levelsItems.Name == "f_max")
+                    {
+                        f_max = levelsItems.InnerText;
+                    }
+                    else if (levelsItems.Name == "electrodes_list")
+                    {
+                        XmlNodeList subLevelcontent = levelsItems.ChildNodes;
+                        foreach (XmlNode subLevelsItems in subLevelcontent)
+                        {
+                            if (subLevelsItems.Name == "electrode")
+                            {
+                                electrodes.Add(subLevelsItems.InnerText);
+                            }
+                            else
+                            {
+                                Debug.LogError("ERROR : invalid content in Xml file, marke '" + subLevelsItems.Name + "' have been found");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("ERROR : invalid content in Xml file, marke '" + levelsItems.Name + "' have been found");
+                    }
+                }
+                List<int> elecsInt = new List<int>();
+                foreach (string s in electrodes)
+                {
+                    elecsInt.Add(reverseDict(Group.ElecNames)[s]);
+                }
+                Group g = new Group(name, elecsInt, int.Parse(f_min), int.Parse(f_max));
+                Debug.Log("Import group : " + g.getText());
+                m_electrodeGroups[index] = g;
+                /*
+				Debug.Log ("__________________________");
+				Debug.Log ("name is "+name);
+				Debug.Log ("f_min is "+f_min);
+				Debug.Log ("f_max is "+f_max);
+				Debug.Log("electrodes :");
+				foreach(String s in electrodes)
+				{
+					Debug.Log ("elec is "+s);
+				}
+				*/
+            }
+        }
+
+    }
+
+    Dictionary<string, int> reverseDict(Dictionary<int, string> input)
+    {
+        Dictionary<string, int> output = new Dictionary<string, int>();
+        foreach (int i in input.Keys)
+        {
+            output.Add(input[i], i);
+        }
+        return output;
+    }
+
+
+    public void UpdateValues(string[] splitValues)
+    {
+        foreach (Group group in m_electrodeGroups)
+        {
+            float[] frequencies = null;
+            float[] amplitudes = null;
+            group.UpdateRadius(frequencies, amplitudes);
+        }
         switch (splitValues[0])
         {
             case "Basse":				//Alpha
@@ -503,10 +613,12 @@ public class EEGDataManager
     private float val1 = 0;
     private float val2 = 0;
 
-    public float moyenneGaucheDroite = 0;
-    public float valGaucheDroite = 0;
-    public float minMoyGD = 0;
-    public float maxMoyGD = 0;
-    public float minGD = 0;
-    public float maxGD = 0;
+    private float moyenneGaucheDroite = 0;
+    private float valGaucheDroite = 0;
+    private float minMoyGD = 0;
+    private float maxMoyGD = 0;
+    private float minGD = 0;
+    private float maxGD = 0;
+
+    private Group[] m_electrodeGroups = new Group[8];
 }

@@ -6,7 +6,7 @@ public class SeaManager : MonoBehaviour
     public MeshRenderer SeaRenderer;
 
 	// Use this for initialization
-	void Start ()
+	void Awake ()
     {
         m_seaMaterial = SeaRenderer.material;
         if (m_seaMaterial.HasProperty("_WavesAmount") == false ||

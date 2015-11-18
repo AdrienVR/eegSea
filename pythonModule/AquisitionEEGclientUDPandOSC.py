@@ -28,6 +28,7 @@ if __name__ == "__main__":
 
     # choix de la fréquence des envois udp
     udp_freq = 128           # (Hz) fréquence de l'envoi des trames udp et osc
+    buf_length = 10
     udp_period = 1./udp_freq
 
     inittime=time.clock()
@@ -39,15 +40,25 @@ if __name__ == "__main__":
             packet = headset.dequeue()
             # maj du temps réel pour décider de l'envoi par udp
             now=time.clock()
+
             if now-lasttime > udp_period :
                 # Envoi UDP des tensions d'électrode
+                timeSin += udp_period
+                if timeSin < tSin :
+                    sinVal = math.sin(2.0*math.pi*timeSin/tSin)
+                else :
+                    timeSin = 0
+                    sinVal = 0
+
                 mystr=str(now) + ';'
-                for k in enumerate(headset.sensors) :
+                for k in range(1, 5) :
                     name = str(k[1])
                     val = str(headset.sensors[k[1]]['value'])
                     if(name != '' and val != '') : mystr += name + ":" + val + ";"
 
-                sock.sendto(mystr,(UDP_IP,UDP_PORT))
+                #sock.sendto(mystr,(UDP_IP,UDP_PORT))
+                buf += mystr + "|"
+                nbBuf += 1
 
                 # Sortie console des infos batterie
                 sys.stdout.write("\rBattery : " + str(packet.battery) + '%. ')
@@ -55,6 +66,13 @@ if __name__ == "__main__":
                     sys.stdout.write("Maybe " + str((packet.battery*600)/100) + " minutes left (LOW BATTERY).             ")
                 else : sys.stdout.write("Maybe " + str((packet.battery*10)/100) + " hours left.                           ")
                 lasttime=now
+
+                lasttime=now
+
+            if nbBuf == buf_length :
+                sock.sendto(buf, (UDP_IP,UDP_PORT))
+                nbBuf = 0
+                buf = ""
     except KeyboardInterrupt:
         headset.close()
         sock.close()

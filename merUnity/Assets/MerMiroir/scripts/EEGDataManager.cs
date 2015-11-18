@@ -17,6 +17,7 @@ public class EEGDataManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+		m_transFourrier = new Fft();
     }
 
     void Start()
@@ -117,15 +118,21 @@ public class EEGDataManager : MonoBehaviour
         return output;
     }
 
+	public float[] GetFT()
+	{
+		return m_transFourrier.GetFT();
+	}
 
-    public void UpdateValues(string[] splitValues)
+	public void UpdateValues(double[] sensorVal)
     {
+		m_transFourrier.addSample(sensorVal);
         foreach (Group group in m_electrodeGroups)
         {
             float[] frequencies = null;
             float[] amplitudes = null;
             group.UpdateRadius(frequencies, amplitudes);
         }
+		/*
         switch (splitValues[0])
         {
             case "Basse":				//Alpha
@@ -147,68 +154,8 @@ public class EEGDataManager : MonoBehaviour
                     }
                     break;
                 }
-            case "Haute":				//Beta		-- mouvement oscillant caméra
-                {
-                    for (int i = 0; i < 4; i++)
-                    {
-                        if (splitValues[i + 1] != null)
-                        {
-                            hauteFrequence[i] = float.Parse(splitValues[i + 1], CultureInfo.InvariantCulture.NumberFormat);
-                            if (hauteFrequence[i] > 0)
-                            {
-                                hauteFrequence[i] = Mathf.Log(hauteFrequence[i]);
-                            }
-                            else
-                            {
-                                hauteFrequence[i] = -50f;
-                            }
-                        }
-                    }
-                    break;
-                }
-            case "Theta":
-                {
-                    for (int i = 0; i < 4; i++)
-                    {
-                        if (splitValues[i + 1] != null)
-                        {
-                            thetaFrequence[i] = float.Parse(splitValues[i + 1], CultureInfo.InvariantCulture.NumberFormat);
-                            if (thetaFrequence[i] > 0)
-                            {
-                                thetaFrequence[i] = Mathf.Log(thetaFrequence[i]);
-                            }
-                            else
-                            {
-                                thetaFrequence[i] = -50f;
-                            }
-                        }
-                    }
-                    break;
-                }
-            case "THF":
-                {
-                    for (int i = 0; i < 3; i++)
-                    {
-                        if (splitValues[i + 1] != null)
-                        {
-                            tabTHF[i] = float.Parse(splitValues[i + 1], CultureInfo.InvariantCulture.NumberFormat);
-                            if (tabTHF[i] > 0)
-                            {
-                                tabTHF[i] = Mathf.Log(tabTHF[i]);
-                            }
-                            else
-                            {
-                                tabTHF[i] = -50f;
-                            }
-                        }
-                    }
-                    break;
-                }
-            default:
-                {
-                    break;
-                }
         }
+                */
     }
 
     // Use this for initialization
@@ -620,5 +567,6 @@ public class EEGDataManager : MonoBehaviour
     private float minGD = 0;
     private float maxGD = 0;
 
-    private Group[] m_electrodeGroups = new Group[8];
+	private Group[] m_electrodeGroups = new Group[8];
+	private Fft m_transFourrier;
 }

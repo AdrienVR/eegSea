@@ -11,7 +11,7 @@ public class ClientBehavior : MonoBehaviour
 {
 
     // Singleton
-    public static ClientBehavior Instance;
+	public static ClientBehavior Instance;
 
     public int numberValuesReceived = 0;
 
@@ -107,6 +107,8 @@ public class ClientBehavior : MonoBehaviour
                         sensorVal[i - 1] = float.Parse(sensorValues[1], CultureInfo.InvariantCulture.NumberFormat);
                         // transFourrier.addSample(sensorVal);
                         //Debug.Log("tests input coucou "+sensorVal[0]);
+
+						EEGDataManager.Instance.UpdateValues(sensorVal);
 
                         //Debug.Log(sensorValues[0] + " - ");
                         //Debug.Log(sensorValues[1] + "\n");

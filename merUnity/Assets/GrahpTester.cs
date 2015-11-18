@@ -3,37 +3,38 @@ using System.Collections;
 
 public class GrahpTester : MonoBehaviour 
 {
-	public float[] sensors;
-
+	public AnimationCurve Curve;
 	// Use this for initialization
 	void Start () 
 	{
-
+		GraphManager.Instance.CreateNCurve(1);
+		//GraphManager.Instance.CreateNCurve(1);
+		for (int i=0; i<64; i++)
+			Curve.AddKey (i, 0);
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		if (sensors.Length > 4)
-			sensors [3] = Mathf.Cos (Time.time * sensors [1]) * 50;
-
-		UpdateCurveCounts();
-		for(int i = 0;i < sensors.Length ; i++)
-		{
-			//Debug.Log(sensors[i]);
-			GraphManager.Instance.SetCurveValue(i, sensors[i]);
+		//ClientBehavior.sensorVal[0]++;
+		if (m_index > 63) {
+			//fourrier = ClientBehavior.transFourrier.getFourrierTransformMod2 ();
+			f=EEGDataManager.Instance.GetFT();
+			m_index = 0;
 		}
-	}
-
-	private void UpdateCurveCounts()
-	{
-		if (m_currentLength != sensors.Length) 
+		//GraphManager.Instance.SetCurveValue(0,(float) fourrier[0,0]);
+		if (f[m_index]>0.1f) Debug.Log("tests  "+m_index+" ; "+f[m_index]); 
+		for (int i=0; i<64; i++)
 		{
-			m_currentLength = sensors.Length;
-			if (m_currentLength > 0)
-				GraphManager.Instance.CreateNCurve (m_currentLength);
+			Curve.RemoveKey(i);
+			Curve.AddKey (i, f [i]);
 		}
+		GraphManager.Instance.SetCurveValue(0,(float) f[m_index++]);
+		
 	}
-
-	private int m_currentLength = -1;
+	
+	double [,] fourrier;
+	float []f;
+	
+	private int m_index = 64;
 }

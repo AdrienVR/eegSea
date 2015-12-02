@@ -38,13 +38,27 @@ public class EEGDataManager : SeaDataManager
         {
             waveListener.SetWave(ElectrodeGroups);
         }
-    }
+	}
+	
+	public void sendTimeSamples(double[] sensorVal)
+	{
+		m_transFourrier.addSample(sensorVal);
+	}
 
-	public void UpdateValues(float[][] sensorVal)
+	public float[][] GetSignal()
+	{
+		return m_transFourrier.getSignal();
+	}
+
+	public void UpdateValues()
     {
+		float[][] amplitudes = new float[14][];
+
+		amplitudes = m_transFourrier.getSignal ();
+
         foreach (Group group in ElectrodeGroups)
         {
-			group.UpdateRadius(sensorVal);
+			group.UpdateRadius(amplitudes);
         }
     }
 
@@ -469,8 +483,8 @@ public class EEGDataManager : SeaDataManager
     private float[] THF = new float[3];
     private float[] THF1 = new float[3];
 
-    private float alphaRadius;
-    private float alphaTHF;
+   // private float alphaRadius;
+    //private float alphaTHF;
     private float val0 = 0;
     private float val1 = 0;
     private float val2 = 0;

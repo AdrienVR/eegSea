@@ -10,6 +10,7 @@ using System.Globalization;
 public class ClientBehavior : MonoBehaviour
 {
 
+	public EEGDataManager EEGDataManager;
     // Singleton
 	public static ClientBehavior Instance;
 
@@ -108,7 +109,7 @@ public class ClientBehavior : MonoBehaviour
                         // transFourrier.addSample(sensorVal);
                         //Debug.Log("tests input coucou "+sensorVal[0]);
 
-						EEGDataManager.Instance.UpdateValues(sensorVal);
+						EEGDataManager.SendTimeSamples(sensorVal);
 
                         //Debug.Log(sensorValues[0] + " - ");
                         //Debug.Log(sensorValues[1] + "\n");

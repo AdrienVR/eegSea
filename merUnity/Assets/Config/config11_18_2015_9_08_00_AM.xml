@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<config>
+	<group>
+		<name>toto</name>
+		<f_min>20</f_min>
+		<f_max>28</f_max>
+		<electrodes_list>
+			<electrode>O1</electrode>
+			<electrode>P7</electrode>
+			<electrode>T7</electrode>
+		</electrodes_list>
+	</group>
+	<group>
+		<name>tutu</name>
+		<f_min>36</f_min>
+		<f_max>42</f_max>
+		<electrodes_list>
+			<electrode>O1</electrode>
+			<electrode>P7</electrode>
+			<electrode>T7</electrode>
+			<electrode>T8</electrode>
+			<electrode>O2</electrode>
+			<electrode>P8</electrode>
+		</electrodes_list>
+	</group>
+</config>

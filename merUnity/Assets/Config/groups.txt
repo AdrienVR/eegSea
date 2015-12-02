@@ -1,0 +1,1 @@
+Avant Gauche;7,8,9,10;Avant Droit;3,4,5,6;Arriere Gauche;13,12,11;Arriere Droit;0,1,2;Toutes;0,1,2,12,13,3,10,11,9,7,8,5,6,4;KineGauche;6,5;KineDroit;8,7;

@@ -4,11 +4,27 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using System;
 
-public class EEGDataManager : MonoBehaviour
+public class EEGDataManager : SeaDataManager
 {
     // Singleton
-    public static EEGDataManager Instance;
+    public float maxTHF = 1f; // coeff pour le bump map
+    public string coef1 = "THF1"; // choix des fréquences gamma pour bump map 1
+    public string coef2 = "THF2"; // choix des fréquences gamma pour bump map 2
+    public string coef3 = "THF3"; // choix des fréquences gamma pour bump map 3
+
+    public float TMoyenneBasse; // temps de maj moyenne alpha
+    public float TMoyenneHaute; // temps de maj moyenne beta
+    public float TMoyenneTheta; // temps de maj moyenne theta
+    public float TMoyenneTHF; // temps de maj moyenne gamma
+    public float TEcartTypeBasse; // idem pour l'ecart type
+    public float TEcartTypeHaute; // ""
+    public float TEcartTypeTheta; // ""
+    public float TEcartTypeTHF; // ""
+
+    public float alphaRadius; // pourcentage de la période des vagues pour temps moyen de maj des hauteurs
+    public float alphaTHF; // temps moyen de maj pour le coeff du bumpmap (texture des vagues de hautes fréquences)
 
     public WaveListener[] WaveListeners;
 
@@ -16,7 +32,6 @@ public class EEGDataManager : MonoBehaviour
 
     void Awake()
     {
-        Instance = this;
 		m_transFourrier = new Fft();
     }
 
@@ -290,6 +305,16 @@ public class EEGDataManager : MonoBehaviour
         Debug.Log(" - Alpha THF :" + alphaTHF);
     }
 
+    public override float GetOscillationLeft()
+    {
+        return GetBetaValues()[0];
+    }
+
+    public override float GetOscillationRight()
+    {
+        return GetBetaValues()[1];
+    }
+
     public void MoyenneGD() //différence gauche droite
     {
         float moyenneGauche;
@@ -443,9 +468,7 @@ public class EEGDataManager : MonoBehaviour
         }
         return (valMin + valMax) / 2f;
     }
-
-
-
+    
     void InitGroups()
     {
         string[] listOfXMLFiles = Directory.GetFiles("Assets/MerMiroir/Config/", "*.xml");

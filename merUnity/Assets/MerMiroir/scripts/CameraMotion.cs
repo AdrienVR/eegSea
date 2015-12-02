@@ -6,7 +6,12 @@ public class CameraMotion : MonoBehaviour {
 	public float speed = 10.0F;
 	public float rotationSpeed = 100.0F;
 
-	void normalMotion()
+    void Update()
+    {
+        NormalMotion();
+    }
+
+    void NormalMotion()
 	{
 		float translation = Input.GetAxis("Vertical") * speed;
 		float rotation = Input.GetAxis("Horizontal") * rotationSpeed;
@@ -30,11 +35,5 @@ public class CameraMotion : MonoBehaviour {
 			transform.Translate(0, 0, translation);
 			transform.Rotate(0, rotation, 0, Space.World);
 		}
-
-
-	}
-
-	void Update() {
-		normalMotion();
 	}
 }

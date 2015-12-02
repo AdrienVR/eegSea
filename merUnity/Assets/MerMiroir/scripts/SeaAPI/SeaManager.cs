@@ -23,7 +23,6 @@ public class SeaManager : WaveListener
     // Update is called once per frame
     void Update()
     {
-        return;
         for (int i = 0; i < m_waveDescriptors.Length && m_waveDescriptors[i] != null; ++i)
         {
             WaveParameter waveParameter = WaveParameters[i];

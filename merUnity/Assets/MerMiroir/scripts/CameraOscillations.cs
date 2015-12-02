@@ -3,7 +3,8 @@ using System.Collections;
 
 public class CameraOscillations : MonoBehaviour 
 {
-	float[] betaValues = new float[4];
+    public SeaDataManager SeaDataManager;
+    float[] betaValues = new float[4];
 	public float maxSpeed=10f;
 	public float rotationMaxSpeed=10f;
 	public float deltaRotationMax=20f;
@@ -36,8 +37,8 @@ public class CameraOscillations : MonoBehaviour
 		transform.Translate (0f, oldy - transform.position.y, 0f, Space.World);
 
 		betaValues = EEGDataManager.Instance.GetBetaValues();
-		
-        float gauche = betaValues [0]; // + betaValues [2];
+
+        float gauche = SeaDataManager.GetOscillationLeft();//betaValues[0]; // + betaValues [2];
 		float droite = betaValues [1]; // + betaValues [3];
 		if (gauche <= 0 || droite <= 0) {
 			maxGauche=maxDroite=0f;

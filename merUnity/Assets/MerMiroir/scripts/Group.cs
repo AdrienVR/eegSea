@@ -39,6 +39,11 @@ public class Group : WaveDescriptor
         m_radius = 0;//CenterValue(moyenneBasse[i], ecartTypeBasse[i], 0f, 1f, basseFrequence[i], 2f);
     }
 
+    public float GetRadius()
+    {
+        return 0;
+    }
+
 	// ACCESSEURS
 	public int getFMin()
 	{

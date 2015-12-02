@@ -5,38 +5,44 @@ public class GrahpTester : MonoBehaviour
 {
     public EEGDataManager EEGDataManager;
     public AnimationCurve Curve;
+    public AnimationCurve Signal;
+
     // Use this for initialization
     void Start()
     {
         GraphManager.Instance.CreateNCurve(1);
         //GraphManager.Instance.CreateNCurve(1);
         for (int i = 0; i < 64; i++)
+        {
             Curve.AddKey(i, 0);
+            Signal.AddKey(i, 0);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+
         //ClientBehavior.sensorVal[0]++;
         if (m_index > 63)
         {
-            //fourrier = ClientBehavior.transFourrier.getFourrierTransformMod2 ();
             f = EEGDataManager.GetFT();
+            signal = EEGDataManager.GetSignal();
             m_index = 0;
         }
-        //GraphManager.Instance.SetCurveValue(0,(float) fourrier[0,0]);
-        if (f[m_index] > 0.1f) Debug.Log("tests  " + m_index + " ; " + f[m_index]);
+
+        //if (f[m_index]>0.1f) Debug.Log("tests  "+m_index+" ; "+f[m_index]); 
         for (int i = 0; i < 64; i++)
         {
             Curve.RemoveKey(i);
-            Curve.AddKey(i, f[i]);
+            Curve.AddKey(i, f[0][i]);
+            Signal.RemoveKey(i);
+            Signal.AddKey(i, signal[0][i]);
         }
-        GraphManager.Instance.SetCurveValue(0, (float)f[m_index++]);
+        GraphManager.Instance.SetCurveValue(0, (float)f[0][m_index++]);
 
     }
-
-    double[,] fourrier;
-    float[] f;
-
+    float[][] f;
+    float[][] signal;
     private int m_index = 64;
 }

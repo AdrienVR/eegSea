@@ -109,7 +109,7 @@ public class ClientBehavior : MonoBehaviour
                         // transFourrier.addSample(sensorVal);
                         //Debug.Log("tests input coucou "+sensorVal[0]);
 
-						EEGDataManager.UpdateValues(new float[14][]);
+						EEGDataManager.sendTimeSamples(sensorVal);
 
                         //Debug.Log(sensorValues[0] + " - ");
                         //Debug.Log(sensorValues[1] + "\n");

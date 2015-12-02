@@ -8,7 +8,8 @@ public class Group : WaveDescriptor
 {
 	public string Name;
 	public List<int> Electrodes;
-	private int F_min, F_max;
+	private int m_FreqMin, m_FreqMax;
+	private float m_TMoyenne, m_TEcartType;
 
 	public static Dictionary<int, string> ElecNames = new Dictionary<int, string>
 	{
@@ -32,24 +33,64 @@ public class Group : WaveDescriptor
 	{
 		Name = n;
 		Electrodes = new List<int>(elecs);
-		F_min = Mathf.Min (f1, f2);
-		F_max = Mathf.Max (f1, f2);
+		m_FreqMin = Mathf.Min (f1, f2);
+		m_FreqMax = Mathf.Max (f1, f2);
 	}
 
-    public override void UpdateRadius(float[] frequencies, float[] amplitudes)
+	public override void UpdateRadius(float[][] sensorVal)
     {
-        m_radius = 0;//CenterValue(moyenneBasse[i], ecartTypeBasse[i], 0f, 1f, basseFrequence[i], 2f);
+		float totalEnergy;
+		foreach (int electrodeIndex in Electrodes)
+		{
+			float electrodeEnergy;
+			for(int frequency=m_FreqMin;frequency<=m_FreqMax;frequency++)
+			{
+				electrodeEnergy+=sensorVal[electrodeIndex][frequency];
+			}
+			totalEnergy+=electrodeEnergy;
+		}
+		m_radius = totalEnergy;
     }
 
     public float GetRadius()
     {
-        return 0;
+		return CenterValue(m_TMoyenne, m_TEcartType, 0f, 1f, m_radius, 2f);
     }
+
+	private float CenterValue(float moyenne, float ecartType, float valMin, float valMax, float valCapteur, float tolerance)
+	{
+		//centre la valeur en fonction de la moyenne et l'écart type
+		if (valCapteur <= 0)
+			return valMin;
+		if (valCapteur <= (moyenne - tolerance * ecartType))
+		{
+			return valMin;
+		}
+		else if (valCapteur > (moyenne + tolerance * ecartType))
+		{
+			return valMax;
+		}
+		else
+		{
+			if (ecartType != 0) return (valMin + valMax) / 2f + (valMax - valMin) * (valCapteur - moyenne) / (ecartType * 2f * tolerance);
+		}
+		return (valMin + valMax) / 2f;
+	}
+
+	public void setMoyenne(float m)
+	{
+		m_TMoyenne = m;
+	}
+
+	public void setEcartType(float e)
+	{
+		m_TEcartType = e;
+	}
 
 	// ACCESSEURS
 	public int getFMin()
 	{
-		return F_min;
+		return m_FreqMin;
 	}
 
 	public string getName()
@@ -59,7 +100,7 @@ public class Group : WaveDescriptor
 	
 	public int getFMax()
 	{
-		return F_max;
+		return m_FreqMax;
 	}
 
 	public List<int> getElecs()
@@ -79,7 +120,7 @@ public class Group : WaveDescriptor
 				eText+=ElecNames[e];
 			first=false;
 		}
-		string fText = "("+F_min.ToString () + " Hz->" + F_max.ToString () + " Hz)";
+		string fText = "("+m_FreqMin.ToString () + " Hz->" + m_FreqMax.ToString () + " Hz)";
 		return getName().ToUpper()+"\n"+ eText + "\n" + fText;
 	}
 

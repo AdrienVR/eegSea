@@ -14,14 +14,7 @@ public class EEGDataManager : SeaDataManager
     public string coef2 = "THF2"; // choix des fréquences gamma pour bump map 2
     public string coef3 = "THF3"; // choix des fréquences gamma pour bump map 3
 
-    public float TMoyenneBasse; // temps de maj moyenne alpha
-    public float TMoyenneHaute; // temps de maj moyenne beta
-    public float TMoyenneTheta; // temps de maj moyenne theta
-    public float TMoyenneTHF; // temps de maj moyenne gamma
-    public float TEcartTypeBasse; // idem pour l'ecart type
-    public float TEcartTypeHaute; // ""
-    public float TEcartTypeTheta; // ""
-    public float TEcartTypeTHF; // ""
+	public float TMoyenne, TEcartType;
 
     public float alphaRadius; // pourcentage de la période des vagues pour temps moyen de maj des hauteurs
     public float alphaTHF; // temps moyen de maj pour le coeff du bumpmap (texture des vagues de hautes fréquences)
@@ -47,39 +40,12 @@ public class EEGDataManager : SeaDataManager
         }
     }
 
-	public void UpdateValues(double[] sensorVal)
+	public void UpdateValues(float[][] sensorVal)
     {
-		m_transFourrier.addSample(sensorVal);
         foreach (Group group in ElectrodeGroups)
         {
-            float[] frequencies = null;
-            float[] amplitudes = null;
-            group.UpdateRadius(frequencies, amplitudes);
+			group.UpdateRadius(sensorVal);
         }
-		/*
-        switch (splitValues[0])
-        {
-            case "Basse":				//Alpha
-                {
-                    for (int i = 0; i < 4; i++) //0 : avant gauche, 1 : avant droite, 2 : arriere gauche, 3 : arriere droite 
-                    {
-                        if (splitValues[i + 1] != null)
-                        {
-                            basseFrequence[i] = float.Parse(splitValues[i + 1], CultureInfo.InvariantCulture.NumberFormat);
-                            if (basseFrequence[i] > 0)
-                            {
-                                basseFrequence[i] = Mathf.Log(basseFrequence[i]);
-                            }
-                            else
-                            {
-                                basseFrequence[i] = -50f;
-                            }
-                        }
-                    }
-                    break;
-                }
-        }
-                */
     }
 
     // Use this for initialization
@@ -451,25 +417,26 @@ public class EEGDataManager : SeaDataManager
         }
 
     }
-    private float CenterValue(float moyenne, float ecartType, float valMin, float valMax, float valCapteur, float tolerance)
-    {
-        //centre la valeur en fonction de la moyenne et l'écart type
-        if (valCapteur <= 0)
-            return valMin;
-        if (valCapteur <= (moyenne - tolerance * ecartType))
-        {
-            return valMin;
-        }
-        else if (valCapteur > (moyenne + tolerance * ecartType))
-        {
-            return valMax;
-        }
-        else
-        {
-            if (ecartType != 0) return (valMin + valMax) / 2f + (valMax - valMin) * (valCapteur - moyenne) / (ecartType * 2f * tolerance);
-        }
-        return (valMin + valMax) / 2f;
-    }
+
+	private float CenterValue(float moyenne, float ecartType, float valMin, float valMax, float valCapteur, float tolerance)
+	{
+		//centre la valeur en fonction de la moyenne et l'écart type
+		if (valCapteur <= 0)
+			return valMin;
+		if (valCapteur <= (moyenne - tolerance * ecartType))
+		{
+			return valMin;
+		}
+		else if (valCapteur > (moyenne + tolerance * ecartType))
+		{
+			return valMax;
+		}
+		else
+		{
+			if (ecartType != 0) return (valMin + valMax) / 2f + (valMax - valMin) * (valCapteur - moyenne) / (ecartType * 2f * tolerance);
+		}
+		return (valMin + valMax) / 2f;
+	}
     
     void InitGroups()
     {
@@ -530,6 +497,8 @@ public class EEGDataManager : SeaDataManager
                     elecsInt.Add(reverseDict(Group.ElecNames)[s]);
                 }
                 Group g = new Group(name, elecsInt, int.Parse(f_min), int.Parse(f_max));
+				g.setMoyenne(TMoyenne);
+				g.setEcartType(TEcartType);
                 Debug.Log("Import group : " + g.getText());
                 if(index <8)
 				{

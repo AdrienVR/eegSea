@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<config>
+	<group>
+		<name>KineDroitBetaGamma</name>
+		<f_min>12</f_min>
+		<f_max>42</f_max>
+		<electrodes_list>
+			<electrode>F3</electrode>
+			<electrode>AF3</electrode>
+		</electrodes_list>
+	</group>
+	<group>
+		<name>KineGaucheBetaGamma</name>
+		<f_min>12</f_min>
+		<f_max>42</f_max>
+		<electrodes_list>
+			<electrode>AF4</electrode>
+			<electrode>F4</electrode>
+		</electrodes_list>
+	</group>
+</config>

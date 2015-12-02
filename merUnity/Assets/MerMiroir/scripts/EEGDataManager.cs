@@ -28,7 +28,9 @@ public class EEGDataManager : SeaDataManager
 
     public WaveListener[] WaveListeners;
 
-    public float Delta { get { return maxGD - minGD; } }
+	public float Delta { get { return maxGD - minGD; } }
+	
+	public Group[] ElectrodeGroups = new Group[8];
 
     void Awake()
     {
@@ -41,14 +43,14 @@ public class EEGDataManager : SeaDataManager
         InitGroups();
         foreach(WaveListener waveListener in WaveListeners)
         {
-            waveListener.SetWave(m_electrodeGroups);
+            waveListener.SetWave(ElectrodeGroups);
         }
     }
 
 	public void UpdateValues(double[] sensorVal)
     {
 		m_transFourrier.addSample(sensorVal);
-        foreach (Group group in m_electrodeGroups)
+        foreach (Group group in ElectrodeGroups)
         {
             float[] frequencies = null;
             float[] amplitudes = null;
@@ -471,7 +473,7 @@ public class EEGDataManager : SeaDataManager
     
     void InitGroups()
     {
-        string[] listOfXMLFiles = Directory.GetFiles("Assets/MerMiroir/Config/", "*.xml");
+        string[] listOfXMLFiles = Directory.GetFiles(Path.Combine(Application.dataPath,"Config"), "*.xml");
 
         int index = 0;
 
@@ -529,21 +531,25 @@ public class EEGDataManager : SeaDataManager
                 }
                 Group g = new Group(name, elecsInt, int.Parse(f_min), int.Parse(f_max));
                 Debug.Log("Import group : " + g.getText());
-                m_electrodeGroups[index] = g;
+                if(index <8)
+				{
+					ElectrodeGroups[index] = g;
+					index++;
+				}
                 /*
 				Debug.Log ("__________________________");
 				Debug.Log ("name is "+name);
 				Debug.Log ("f_min is "+f_min);
 				Debug.Log ("f_max is "+f_max);
 				Debug.Log("electrodes :");
-				foreach(String s in electrodes)
+				foreach(string s in electrodes)
 				{
 					Debug.Log ("elec is "+s);
 				}
 				*/
             }
         }
-
+		Debug.Log ("Nombre de groupe : "+index);
     }
 
     Dictionary<string, int> reverseDict(Dictionary<int, string> input)
@@ -591,6 +597,5 @@ public class EEGDataManager : SeaDataManager
     private float minGD = 0;
     private float maxGD = 0;
 
-	private Group[] m_electrodeGroups = new Group[8];
 	private Fft m_transFourrier;
 }

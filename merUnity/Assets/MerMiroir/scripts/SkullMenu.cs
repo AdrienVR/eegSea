@@ -13,12 +13,15 @@ public class SkullMenu : MonoBehaviour
     private List<int> elecs_on;
     private Dictionary<int, List<int>> groups, freqs;
 	public List<Group> config_list;
-    string path = "Assets/MerMiroir/Config/groups.txt";
-	string pathFreqs = "Assets/MerMiroir/Config/freqs.txt";
-	
+	string folder;
+	string path, pathFreqs;
+
 	// Use this for initialization
     void Start()
     {
+		folder = Path.Combine (Application.dataPath, "Config");
+		path = Path.Combine(folder, "groups.txt");
+		pathFreqs = Path.Combine(folder, "freqs.txt");
         elecs_on = new List<int>();
 		config_list = new List<Group> ();
         initGroups();

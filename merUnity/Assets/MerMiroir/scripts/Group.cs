@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
+[Serializable]
 public class Group : WaveDescriptor
 {
-	private string name;
-	private List<int> electrodes;
+	public string Name;
+	public List<int> Electrodes;
 	private int F_min, F_max;
 
 	public static Dictionary<int, string> ElecNames = new Dictionary<int, string>
@@ -28,8 +30,8 @@ public class Group : WaveDescriptor
 
 	public Group (string n, List<int> elecs, int f1, int f2)
 	{
-		name = n;
-		electrodes = new List<int>(elecs);
+		Name = n;
+		Electrodes = new List<int>(elecs);
 		F_min = Mathf.Min (f1, f2);
 		F_max = Mathf.Max (f1, f2);
 	}
@@ -52,7 +54,7 @@ public class Group : WaveDescriptor
 
 	public string getName()
 	{
-		return name;
+		return Name;
 	}
 	
 	public int getFMax()
@@ -62,14 +64,14 @@ public class Group : WaveDescriptor
 
 	public List<int> getElecs()
 	{
-		return electrodes;
+		return Electrodes;
 	}
 
 	public string getText()
 	{
 		string eText = "";
 		bool first = true;
-		foreach (int e in electrodes)
+		foreach (int e in Electrodes)
 		{
 			if(!first)
 				eText+=", "+ElecNames[e];

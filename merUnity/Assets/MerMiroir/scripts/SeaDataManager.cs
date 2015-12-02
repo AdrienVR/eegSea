@@ -4,6 +4,8 @@ using System;
 
 public abstract class SeaDataManager : MonoBehaviour
 {
+    public abstract WaveDescriptor[] GetWaveDescriptors();
+
     //rugosité de la texture de la mer
     public abstract float getTHF(string coef1);
 

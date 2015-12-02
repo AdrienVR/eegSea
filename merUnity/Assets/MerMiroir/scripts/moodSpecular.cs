@@ -2,7 +2,9 @@
 using System.Collections;
 
 public class moodSpecular : MonoBehaviour {
-	float coeff=0.5f;
+
+    public EEGDataManager EEGDataManager;
+    float coeff=0.5f;
 	public float halftime=1f;
 	public float leftIntensity = 1f;
 	public float rightIntensity = 1f;
@@ -15,15 +17,15 @@ public class moodSpecular : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		EEGDataManager.Instance.MoyenneGD();
-        float delta = EEGDataManager.Instance.Delta;
+		EEGDataManager.MoyenneGD();
+        float delta = EEGDataManager.Delta;
 		float alpha = Mathf.Min(Time.deltaTime / halftime, 1f);
 		if (delta == 0) {
 			coeff=(1f-alpha)*coeff +alpha*0.5f;
 			GetComponent<Light>().intensity = (leftIntensity * coeff + rightIntensity * (1f-coeff));
 			return;
 		}
-        coeff = EEGDataManager.Instance.GetAlpha(coeff, alpha, delta);
+        coeff = EEGDataManager.GetAlpha(coeff, alpha, delta);
 		GetComponent<Light>().intensity = (leftIntensity * coeff + rightIntensity * (1f-coeff));
 	
 	}

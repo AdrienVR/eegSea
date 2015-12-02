@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System;
 
-public class SeaManager : WaveListener
+public class SeaManager : MonoBehaviour
 {
     public MeshRenderer SeaRenderer;
     public WaveParameter[] WaveParameters;
@@ -98,7 +98,7 @@ public class SeaManager : WaveListener
         if (m_seaMaterial.HasProperty("_windDir")) m_seaMaterial.SetFloat("_windDir", windDir * Mathf.Deg2Rad);
     }
 
-    public override void SetWave(WaveDescriptor[] waveDescriptors)
+    public void SetWaveDescriptors(WaveDescriptor[] waveDescriptors)
     {
         m_waveDescriptors = waveDescriptors;
     }

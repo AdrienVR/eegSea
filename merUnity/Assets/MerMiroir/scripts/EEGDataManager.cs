@@ -5,13 +5,10 @@ using System.Xml;
 
 public class EEGDataManager : SeaDataManager
 {
-
     public float TMoyenne, TEcartType;
 
     public float alphaRadius; // pourcentage de la période des vagues pour temps moyen de maj des hauteurs
     public float alphaTHF; // temps moyen de maj pour le coeff du bumpmap (texture des vagues de hautes fréquences)
-
-    public WaveListener[] WaveListeners;
 
     public float Delta { get { return maxGD - minGD; } }
 
@@ -32,21 +29,22 @@ public class EEGDataManager : SeaDataManager
 
         // Initialisation des groupes depuis les fichiers .xml
         InitGroups();
-        foreach (WaveListener waveListener in WaveListeners)
-        {
-            waveListener.SetWave(ElectrodeGroups);
-        }
-	}
-	
-	public void sendTimeSamples(double[] sensorVal)
-	{
-		m_transFourrier.addSample(sensorVal);
-	}
+    }
 
-	public float[][] GetSignal()
-	{
-		return m_transFourrier.getSignal();
-	}
+    public override WaveDescriptor[] GetWaveDescriptors()
+    {
+        return ElectrodeGroups;
+    }
+
+    public void sendTimeSamples(double[] sensorVal)
+    {
+        m_transFourrier.addSample(sensorVal);
+    }
+
+    public float[][] GetSignal()
+    {
+        return m_transFourrier.getSignal();
+    }
 
     void Update()
     {
@@ -56,9 +54,9 @@ public class EEGDataManager : SeaDataManager
             SetAlphaRad(alphaRadius);
             memAlphaRadius = alphaRadius;
         }
-        
+
         //change les coefs des vagues hautes fréquences (texture)
-        calculTHF(maxTHF);
+        //calculTHF(maxTHF);
 
         foreach (Group group in ElectrodeGroups)
         {
@@ -66,15 +64,15 @@ public class EEGDataManager : SeaDataManager
         }
     }
 
-	public void UpdateValues()
+    public void UpdateValues()
     {
-		float[][] amplitudes = new float[14][];
+        float[][] amplitudes = new float[14][];
 
-		amplitudes = m_transFourrier.getSignal ();
+        amplitudes = m_transFourrier.getSignal();
 
         foreach (Group group in ElectrodeGroups)
         {
-			group.UpdateRadius(amplitudes);
+            group.UpdateRadius(amplitudes);
         }
     }
 
@@ -183,10 +181,10 @@ public class EEGDataManager : SeaDataManager
         float valGauche;
         float valDroite;
 
-        moyenneGauche = moyenneBasse[0] + moyenneBasse[2] + moyenneHaute[0] + moyenneHaute[2] + moyenneTheta[0] + moyenneTheta[2];
-        moyenneDroite = moyenneBasse[1] + moyenneBasse[3] + moyenneHaute[1] + moyenneHaute[3] + moyenneTheta[1] + moyenneTheta[3];
-        valGauche = basseFrequence[0] + basseFrequence[2] + hauteFrequence[0] + hauteFrequence[2] + thetaFrequence[0] + thetaFrequence[2];
-        valDroite = basseFrequence[1] + basseFrequence[3] + hauteFrequence[1] + hauteFrequence[3] + thetaFrequence[1] + thetaFrequence[3];
+        moyenneGauche = 0;// moyenneBasse[0] + moyenneBasse[2] + moyenneHaute[0] + moyenneHaute[2] + moyenneTheta[0] + moyenneTheta[2];
+        moyenneDroite = 0;// moyenneBasse[1] + moyenneBasse[3] + moyenneHaute[1] + moyenneHaute[3] + moyenneTheta[1] + moyenneTheta[3];
+        valGauche = 0;// basseFrequence[0] + basseFrequence[2] + hauteFrequence[0] + hauteFrequence[2] + thetaFrequence[0] + thetaFrequence[2];
+        valDroite = 0;//basseFrequence[1] + basseFrequence[3] + hauteFrequence[1] + hauteFrequence[3] + thetaFrequence[1] + thetaFrequence[3];
         if (moyenneGauche <= 0 || moyenneDroite <= 0 || valGauche <= 0 || valDroite <= 0)
         {
             moyenneGaucheDroite = valGaucheDroite = minMoyGD = minGD = 0f;
@@ -213,7 +211,7 @@ public class EEGDataManager : SeaDataManager
 
     public float[] GetBetaValues()
     {
-        return moyenneHaute;
+        return new float[] { 0, 0 };// moyenneHaute;
     }
 
     public override float getTHF(string coef)
@@ -227,30 +225,17 @@ public class EEGDataManager : SeaDataManager
         return 1f; //valeur par défaut
 
     }
-    public void calculRadius()
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            //Calcul les différentes valeurs des radius des vagues (correspont à un rayon)
-            tabVal1[i] = CenterValue(moyenneBasse[i], ecartTypeBasse[i], 0f, 1f, basseFrequence[i], 2f);
-            tabVal1[i + 4] = CenterValue(moyenneHaute[i], ecartTypeHaute[i], 0f, 1f, hauteFrequence[i], 2f);
-            tabVal1[i + 8] = CenterValue(moyenneTheta[i], ecartTypeTheta[i], 0f, 1f, thetaFrequence[i], 2f);
-            //tabVal[i]=((1-alphaRadius)*tabVal[i])+(alphaRadius*tabVal1[i]);
-            //tabVal[i+4]=((1-alphaRadius)*tabVal[i+4])+(alphaRadius*tabVal1[i+4]);
-            //tabVal[i+8]=((1-alphaRadius)*tabVal[i+8])+(alphaRadius*tabVal1[i+8]);		
-        }
-    }
 
     public void ResetValues()
     {
         for (int i = 0; i < 4; i++)
         {
-            basseFrequence[i] = -40f;
-            hauteFrequence[i] = -40f;
-            thetaFrequence[i] = -40f;
+            //basseFrequence[i] = -40f;
+            //hauteFrequence[i] = -40f;
+            //thetaFrequence[i] = -40f;
             if (i < 3)
             {
-                tabTHF[i] = -40f;
+                //  tabTHF[i] = -40f;
             }
 
         }
@@ -349,7 +334,7 @@ public class EEGDataManager : SeaDataManager
         return output;
     }
 
-    public float[] GetFT()
+    public float[][] GetFT()
     {
         return m_transFourrier.GetFT();
     }
@@ -357,7 +342,6 @@ public class EEGDataManager : SeaDataManager
     private float[] THF = new float[3];
     private float[] THF1 = new float[3];
 
-    private float alphaRadius;
     private float val0 = 0;
     private float val1 = 0;
     private float val2 = 0;

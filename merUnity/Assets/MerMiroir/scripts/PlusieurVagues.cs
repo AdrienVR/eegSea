@@ -1,9 +1,8 @@
 ﻿
 using UnityEngine;
 
-public class PlusieurVagues : WaveListener
+public class PlusieurVagues : MonoBehaviour
 {
-
     public SeaManager SeaManager;
     public SeaDataManager SeaDataManager;
     //les vagues filles de cet objet sont crees a partir du tableau parametresVagues
@@ -12,6 +11,8 @@ public class PlusieurVagues : WaveListener
     //les perlin vagues ne sont plus utilisbles : pas implementees dans le shader
     public float windDir = 70f; // d'où vient le vent
 
+    public float alphaRadius; // pourcentage de la période des vagues pour temps moyen de maj des hauteurs
+    public float alphaTHF; // temps moyen de maj pour le coeff du bumpmap (texture des vagues de hautes fréquences)
     // public bool debug;
 
     public float maxTHF = 1f; // coeff pour le bump map
@@ -30,14 +31,6 @@ public class PlusieurVagues : WaveListener
     public GameObject targetGameObject;
 
     public int numberOfWavesToUse = 8;
-
-
-    public override void SetWave(WaveDescriptor[] waveDescriptors)
-    {
-        m_waveDescriptors = waveDescriptors;
-    }
-
-    private WaveDescriptor[] m_waveDescriptors;
 
     public Vector3 CalculeImage(Vector3 startPoint)
     {
@@ -105,6 +98,8 @@ public class PlusieurVagues : WaveListener
 
     void Start()
     {
+        SeaManager.SetWaveDescriptors(SeaDataManager.GetWaveDescriptors());
+
         SeaManager.SetWavesAmount(amount);
         SeaManager.SetWindDirection(windDir);
 

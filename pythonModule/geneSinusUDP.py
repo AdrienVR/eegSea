@@ -17,10 +17,11 @@ if __name__ == "__main__":
     MINQ = 0
 
     #Paramétrage du sinus (fréquence en Hz)
-    freqSin = 5
+    freqSin = 10
     tSin = 1.0/freqSin
     timeSin = 0.0
     sinVal = 0.0
+    bufSize = 10
 
     # ouverture de la socket UDP
     sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
@@ -44,11 +45,11 @@ if __name__ == "__main__":
             now=time.clock()
 
 
-            if now-lasttime > udp_period :
+            if now-lasttime > float(udp_period)/float(bufSize) :
                 # Envoi UDP des tensions d'électrode
-                timeSin += udp_period
+                timeSin += float(udp_period)/float(bufSize)
                 if timeSin < tSin :
-                    sinVal = math.sin(2.0*math.pi*timeSin/tSin)
+                    sinVal = math.sin(2.0*math.pi*freqSin*timeSin)
                 else :
                     timeSin = 0
                     sinVal = 0
@@ -65,8 +66,9 @@ if __name__ == "__main__":
 
                 lasttime=now
 
-            if nbBuf == 10 :
+            if nbBuf == bufSize :
                 sock.sendto(buf, (UDP_IP,UDP_PORT))
+                #print(buf)
                 nbBuf = 0
                 buf = ""
 

@@ -36,11 +36,9 @@ public class CameraOscillations : MonoBehaviour
 		transform.Translate (0f, 0f, translation);
 		transform.Translate (0f, oldy - transform.position.y, 0f, Space.World);
 
-		betaValues = EEGDataManager.Instance.GetBetaValues();
-
         float gauche = SeaDataManager.GetOscillationLeft();//betaValues[0]; // + betaValues [2];
-		float droite = betaValues [1]; // + betaValues [3];
-		if (gauche <= 0 || droite <= 0) {
+		float droite = SeaDataManager.GetOscillationRight(); // + betaValues [3];
+        if (gauche <= 0 || droite <= 0) {
 			maxGauche=maxDroite=0f;
 			speed=Mathf.Max(speed*(1f-Time.deltaTime/closingTime),0f);
 			if ((Mathf.Abs(transform.position.x)+Mathf.Abs (transform.position.z)>1e3f) && (speed<0.05f*maxSpeed)) transform.position=new Vector3(0f,transform.position.y,0f); // désolé mais sinon ça risque de boguer

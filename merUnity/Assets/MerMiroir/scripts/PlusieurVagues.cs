@@ -14,7 +14,11 @@ public class PlusieurVagues : WaveListener
 
     // public bool debug;
 
-    float memAlphaRadius;
+    public float maxTHF = 1f; // coeff pour le bump map
+    public string coef1 = "THF1"; // choix des fréquences gamma pour bump map 1
+    public string coef2 = "THF2"; // choix des fréquences gamma pour bump map 2
+    public string coef3 = "THF3"; // choix des fréquences gamma pour bump map 3
+
     float memAlphaTHF;
 
     public WaveParameter[] parametresVagues = new WaveParameter[8];
@@ -101,10 +105,6 @@ public class PlusieurVagues : WaveListener
 
     void Start()
     {
-
-        //		perlinVagues = gameObject.GetComponentsInChildren<PerlinVague>();
-        SeaDataManager.Initialize(alphaRadius, alphaTHF); //Appeler init une seulf fois dans le programme	//Given param: alpha radius & alpha THF
-
         SeaManager.SetWavesAmount(amount);
         SeaManager.SetWindDirection(windDir);
 
@@ -133,26 +133,10 @@ public class PlusieurVagues : WaveListener
     // Update is called once per frame
     void Update()
     {
-        if (alphaRadius != memAlphaRadius)
-        {
-            alphaRadius = Mathf.Max(0.0001f, alphaRadius);
-            SeaDataManager.SetAlphaRad(alphaRadius);
-            memAlphaRadius = alphaRadius;
-        }
-        if (alphaTHF != memAlphaTHF)
-        {
-            alphaTHF = Mathf.Max(0.0001f, alphaTHF);
-            SeaDataManager.SetAlphaTHF(alphaTHF);
-            memAlphaTHF = alphaTHF;
-        }
-
-        SeaDataManager.MAJmoyenneEcartType(Time.deltaTime, TMoyenneBasse, TMoyenneHaute, TMoyenneTheta, TMoyenneTHF, TEcartTypeBasse, TEcartTypeHaute, TEcartTypeTheta, TEcartTypeTHF);
-
         SeaManager.SetWavesAmount(amount);
         SeaManager.SetWindDirection(windDir);
 
         //change les coefs des vagues hautes fréquences (texture)
-        SeaDataManager.calculTHF(maxTHF);
         Vector4 thfs;
         thfs.y = SeaDataManager.getTHF(coef1);
         thfs.z = SeaDataManager.getTHF(coef2);
@@ -166,8 +150,28 @@ public class PlusieurVagues : WaveListener
         SeaManager.SetCoefHF(thfs.w, "3");
         // for the shader version 4
         SeaManager.SetCoeffsHF(thfs);
-        
+
         //Client.displayValues();
+    }
+
+    public void CalculTHF(float maxTHF)
+    {
+        //Calcule les différentes valeurs que prendront les coefs correspondant aux très hautes fréquences (coef modifiant la texture pour donner l'impression de vagues de surface)
+        THF1[0] = Mathf.Exp(MathsTool.CenterValue(moyenneTHF[0], ecartTypeTHF[0], Mathf.Log(0.1f), Mathf.Log(maxTHF), tabTHF[0], 1f));
+        if (THF1[0] < 0.1f)
+            THF1[0] = 0.1f;
+        THF1[1] = Mathf.Exp(MathsTool.CenterValue(moyenneTHF[1], ecartTypeTHF[1], Mathf.Log(0.1f), Mathf.Log(maxTHF), tabTHF[1], 1f));
+        if (THF1[1] < 0.1f)
+            THF1[1] = 0.1f;
+        THF1[2] = Mathf.Exp(MathsTool.CenterValue(moyenneTHF[2], ecartTypeTHF[2], Mathf.Log(0.1f), Mathf.Log(maxTHF), tabTHF[2], 1f));
+        if (THF1[2] < 0.1f)
+            THF1[2] = 0.1f;
+        for (int i = 0; i < 3; i++)
+        {
+            float alpha = Mathf.Min(1, Time.deltaTime / alphaTHF);
+            THF[i] = (1f - alpha) * THF[i] + (alpha * THF1[i]); //valeur a t+1 tenant compte de la valeur précédente
+        }
+
     }
 
     void OnDisable()
@@ -175,4 +179,9 @@ public class PlusieurVagues : WaveListener
         ClientBehavior.Instance.Disable();
     }
 
+    private float[] tabTHF = new float[3];
+    private float[] moyenneTHF = new float[3];
+    private float[] ecartTypeTHF = new float[3];
+    private float[] THF = new float[3];
+    private float[] THF1 = new float[3];
 }

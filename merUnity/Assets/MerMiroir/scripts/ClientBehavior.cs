@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
 using System.Net;
 using System.Text;
@@ -10,8 +9,10 @@ using System.Globalization;
 public class ClientBehavior : MonoBehaviour
 {
 
+    public EEGDataManager EEGDataManager;
+
     // Singleton
-	public static ClientBehavior Instance;
+    public static ClientBehavior Instance;
 
     public int numberValuesReceived = 0;
 
@@ -108,7 +109,7 @@ public class ClientBehavior : MonoBehaviour
                         // transFourrier.addSample(sensorVal);
                         //Debug.Log("tests input coucou "+sensorVal[0]);
 
-						EEGDataManager.Instance.UpdateValues(sensorVal);
+						EEGDataManager.UpdateValues(new float[14][]);
 
                         //Debug.Log(sensorValues[0] + " - ");
                         //Debug.Log(sensorValues[1] + "\n");

@@ -1,50 +1,66 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Globalization;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using System;
 
 public class EEGDataManager : SeaDataManager
 {
-    // Singleton
-    public float maxTHF = 1f; // coeff pour le bump map
-    public string coef1 = "THF1"; // choix des fréquences gamma pour bump map 1
-    public string coef2 = "THF2"; // choix des fréquences gamma pour bump map 2
-    public string coef3 = "THF3"; // choix des fréquences gamma pour bump map 3
 
-	public float TMoyenne, TEcartType;
+    public float TMoyenne, TEcartType;
 
     public float alphaRadius; // pourcentage de la période des vagues pour temps moyen de maj des hauteurs
     public float alphaTHF; // temps moyen de maj pour le coeff du bumpmap (texture des vagues de hautes fréquences)
 
     public WaveListener[] WaveListeners;
 
-	public float Delta { get { return maxGD - minGD; } }
-	
-	public Group[] ElectrodeGroups = new Group[8];
+    public float Delta { get { return maxGD - minGD; } }
+
+    public Group[] ElectrodeGroups = new Group[8];
+
+    float memAlphaRadius;
 
     void Awake()
     {
-		m_transFourrier = new Fft();
+        m_transFourrier = new Fft();
     }
 
     void Start()
     {
+
+        //		perlinVagues = gameObject.GetComponentsInChildren<PerlinVague>();
+        Initialize(alphaRadius, alphaTHF); //Appeler init une seulf fois dans le programme	//Given param: alpha radius & alpha THF
+
         // Initialisation des groupes depuis les fichiers .xml
         InitGroups();
-        foreach(WaveListener waveListener in WaveListeners)
+        foreach (WaveListener waveListener in WaveListeners)
         {
             waveListener.SetWave(ElectrodeGroups);
         }
     }
 
-	public void UpdateValues(float[][] sensorVal)
+    void Update()
+    {
+        if (alphaRadius != memAlphaRadius)
+        {
+            alphaRadius = Mathf.Max(0.0001f, alphaRadius);
+            SetAlphaRad(alphaRadius);
+            memAlphaRadius = alphaRadius;
+        }
+        
+        //change les coefs des vagues hautes fréquences (texture)
+        calculTHF(maxTHF);
+
+        foreach (Group group in ElectrodeGroups)
+        {
+            group.MAJmoyenneEcartType(Time.deltaTime);
+        }
+    }
+
+    public void UpdateValues(float[][] sensorVal)
     {
         foreach (Group group in ElectrodeGroups)
         {
-			group.UpdateRadius(sensorVal);
+            group.UpdateRadius(sensorVal);
         }
     }
 
@@ -54,37 +70,25 @@ public class EEGDataManager : SeaDataManager
 
         alphaRadius = alphaRadiusValue;
         alphaTHF = Mathf.Max(0.001f, alphaTHFValue);
+    }
 
-        for (int i = 0; i < 4; i++)
-        {
-            basseFrequence[i] = -40f;
-            moyenneBasse[i] = 0f;
-            ecartTypeBasse[i] = 1f;
-            hauteFrequence[i] = -40f;
-            moyenneHaute[i] = 0f;
-            ecartTypeHaute[i] = 1f;
-            thetaFrequence[i] = -40f;
-            moyenneTheta[i] = 0f;
-            ecartTypeTheta[i] = 1;
-            if (i < 3)
-            {
-                tabTHF[i] = -40f;
-                moyenneTHF[i] = 0f;
-                ecartTypeTHF[i] = 1f;
-                THF[i] = 0.1f;
-                THF1[i] = 0.1f;
-            }
-        }
-        for (int i = 0; i < 12; i++)
-        { // valeur à multiplier par rmax pour le rayon des vagues
-            //tabVal[i]=0f;
-            tabVal1[i] = 0f;
-        }
+    public override bool DeltaLight()
+    {
+        return Delta > 0;
+    }
+
+    public override float GetLightCoefficient(float lastCoef)
+    {
+        MoyenneGD();
+        float delta = Delta;
+        float alpha = Mathf.Min(Time.deltaTime, 1f);
+
+        return GetAlpha(lastCoef, alpha, delta);
     }
 
     public float GetAlpha(float coeff, float alpha, float delta)
     {
-		return (1f-alpha)*coeff+alpha*(maxGD - valGaucheDroite) / delta;
+        return (1f - alpha) * coeff + alpha * (maxGD - valGaucheDroite) / delta;
     }
 
     private float FunMoyenne(float[] tab) //moyenne réel en fonction d'un tableau de valeurs
@@ -97,20 +101,6 @@ public class EEGDataManager : SeaDataManager
             moyenne += tab[i];
         }
         return (moyenne / tab.Length);
-    }
-    private float EstimationMoyenne(float alpha, float moyenne, float lastValue) //estimation d'une moyenne à l'instant t en tenant compte de la moyenne précédente
-    {
-        if (lastValue <= 0)
-        { // mesure non valable
-            val0 = 0f;
-            return 0f;
-        }
-        if (val0 == 0f)
-        { // première valeur acceptable pour lastValue
-            val0 = lastValue;
-            return lastValue;
-        }
-        return ((1f - alpha) * moyenne + alpha * lastValue);
     }
 
     private float FunEcartType(float[] tab) //écart type réel en fonction d'un tableau de valeurs
@@ -148,27 +138,6 @@ public class EEGDataManager : SeaDataManager
         return ((1f - alpha) * ecartType + alpha * Mathf.Abs(lastValue - moyenne));
     }
 
-    public void MAJmoyenneEcartType(float dt, float TMbasse, float TMhaute, float TMtheta, float TMthf, float TETbasse, float TEThaute, float TETtheta, float TETthf)
-    {
-        //mise à jour des moyennes et des écarts type
-        //dt(s) : intervalle de temps entre deux frames 
-        //T(s) : L'estimation de la moyenne/ecart type tient compte de toutes les valeurs recu durant la période T 
-        for (int i = 0; i < 4; i++)
-        {
-            moyenneBasse[i] = EstimationMoyenne(dt / TMbasse, moyenneBasse[i], basseFrequence[i]);
-            ecartTypeBasse[i] = EstimationEcartType(dt / TETbasse, ecartTypeBasse[i], moyenneBasse[i], basseFrequence[i]);
-            moyenneHaute[i] = EstimationMoyenne(dt / TMhaute, moyenneHaute[i], hauteFrequence[i]);
-            ecartTypeHaute[i] = EstimationEcartType(dt / TEThaute, ecartTypeHaute[i], moyenneHaute[i], hauteFrequence[i]);
-            moyenneTheta[i] = EstimationMoyenne(dt / TMtheta, moyenneTheta[i], thetaFrequence[i]);
-            ecartTypeTheta[i] = EstimationEcartType(dt / TETtheta, ecartTypeTheta[i], moyenneTheta[i], thetaFrequence[i]);
-            if (i < 3)
-            {
-                moyenneTHF[i] = EstimationMoyenne(dt / TMthf, moyenneTHF[i], tabTHF[i]);
-                ecartTypeTHF[i] = EstimationEcartType(dt / TETthf, ecartTypeTHF[i], moyenneTHF[i], tabTHF[i]);
-            }
-        }
-    }
-
     public static float getAmount()
     {
         return 1f;
@@ -181,12 +150,6 @@ public class EEGDataManager : SeaDataManager
     {
         alphaRadius = value;
         Debug.Log(" - AlphaRadius :" + alphaRadius);
-    }
-
-    public void SetAlphaTHF(float value)
-    {
-        alphaTHF = Mathf.Max(0.0001f, value);
-        Debug.Log(" - Alpha THF :" + alphaTHF);
     }
 
     public override float GetOscillationLeft()
@@ -239,28 +202,7 @@ public class EEGDataManager : SeaDataManager
         return moyenneHaute;
     }
 
-
-    public void calculTHF(float maxTHF)
-    {
-        //Calcul les différentes valeurs que prendront les coefs correspondant aux très hautes fréquences (coef modifiant la texture pour donner l'impression de vagues de surface)
-        THF1[0] = Mathf.Exp(CenterValue(moyenneTHF[0], ecartTypeTHF[0], Mathf.Log(0.1f), Mathf.Log(maxTHF), tabTHF[0], 1f));
-        if (THF1[0] < 0.1f)
-            THF1[0] = 0.1f;
-        THF1[1] = Mathf.Exp(CenterValue(moyenneTHF[1], ecartTypeTHF[1], Mathf.Log(0.1f), Mathf.Log(maxTHF), tabTHF[1], 1f));
-        if (THF1[1] < 0.1f)
-            THF1[1] = 0.1f;
-        THF1[2] = Mathf.Exp(CenterValue(moyenneTHF[2], ecartTypeTHF[2], Mathf.Log(0.1f), Mathf.Log(maxTHF), tabTHF[2], 1f));
-        if (THF1[2] < 0.1f)
-            THF1[2] = 0.1f;
-        for (int i = 0; i < 3; i++)
-        {
-            float alpha = Mathf.Min(1, Time.deltaTime / alphaTHF);
-            THF[i] = (1f - alpha) * THF[i] + (alpha * THF1[i]); //valeur a t+1 tenant compte de la valeur précédente
-        }
-
-    }
-
-    public float getTHF(string coef)
+    public override float getTHF(string coef)
     {
         if (coef == "THF1")
             return THF[0];
@@ -300,63 +242,9 @@ public class EEGDataManager : SeaDataManager
         }
     }
 
-    public void CalculRadius()
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            //Calcule les différentes valeurs des radius des vagues (correspont à un rayon)
-            tabVal1[i] = CenterValue(moyenneBasse[i], ecartTypeBasse[i], 0f, 1f, basseFrequence[i], 2f);
-            tabVal1[i + 4] = CenterValue(moyenneHaute[i], ecartTypeHaute[i], 0f, 1f, hauteFrequence[i], 2f);
-            tabVal1[i + 8] = CenterValue(moyenneTheta[i], ecartTypeTheta[i], 0f, 1f, thetaFrequence[i], 2f);
-            //tabVal[i]=((1-alphaRadius)*tabVal[i])+(alphaRadius*tabVal1[i]);
-            //tabVal[i+4]=((1-alphaRadius)*tabVal[i+4])+(alphaRadius*tabVal1[i+4]);
-            //tabVal[i+8]=((1-alphaRadius)*tabVal[i+8])+(alphaRadius*tabVal1[i+8]);		
-        }
-    }
-
-    public void CalculTHF(float maxTHF)
-    {
-        //Calcule les différentes valeurs que prendront les coefs correspondant aux très hautes fréquences (coef modifiant la texture pour donner l'impression de vagues de surface)
-        THF1[0] = Mathf.Exp(CenterValue(moyenneTHF[0], ecartTypeTHF[0], Mathf.Log(0.1f), Mathf.Log(maxTHF), tabTHF[0], 1f));
-        if (THF1[0] < 0.1f)
-            THF1[0] = 0.1f;
-        THF1[1] = Mathf.Exp(CenterValue(moyenneTHF[1], ecartTypeTHF[1], Mathf.Log(0.1f), Mathf.Log(maxTHF), tabTHF[1], 1f));
-        if (THF1[1] < 0.1f)
-            THF1[1] = 0.1f;
-        THF1[2] = Mathf.Exp(CenterValue(moyenneTHF[2], ecartTypeTHF[2], Mathf.Log(0.1f), Mathf.Log(maxTHF), tabTHF[2], 1f));
-        if (THF1[2] < 0.1f)
-            THF1[2] = 0.1f;
-        for (int i = 0; i < 3; i++)
-        {
-            float alpha = Mathf.Min(1, Time.deltaTime / alphaTHF);
-            THF[i] = (1f - alpha) * THF[i] + (alpha * THF1[i]); //valeur a t+1 tenant compte de la valeur précédente
-        }
-
-    }
-
-	private float CenterValue(float moyenne, float ecartType, float valMin, float valMax, float valCapteur, float tolerance)
-	{
-		//centre la valeur en fonction de la moyenne et l'écart type
-		if (valCapteur <= 0)
-			return valMin;
-		if (valCapteur <= (moyenne - tolerance * ecartType))
-		{
-			return valMin;
-		}
-		else if (valCapteur > (moyenne + tolerance * ecartType))
-		{
-			return valMax;
-		}
-		else
-		{
-			if (ecartType != 0) return (valMin + valMax) / 2f + (valMax - valMin) * (valCapteur - moyenne) / (ecartType * 2f * tolerance);
-		}
-		return (valMin + valMax) / 2f;
-	}
-    
     void InitGroups()
     {
-        string[] listOfXMLFiles = Directory.GetFiles(Path.Combine(Application.dataPath,"Config"), "*.xml");
+        string[] listOfXMLFiles = Directory.GetFiles(Path.Combine(Application.dataPath, "Config"), "*.xml");
 
         int index = 0;
 
@@ -413,14 +301,14 @@ public class EEGDataManager : SeaDataManager
                     elecsInt.Add(reverseDict(Group.ElecNames)[s]);
                 }
                 Group g = new Group(name, elecsInt, int.Parse(f_min), int.Parse(f_max));
-				g.setMoyenne(TMoyenne);
-				g.setEcartType(TEcartType);
+                g.setMoyenne(TMoyenne);
+                g.setEcartType(TEcartType);
                 Debug.Log("Import group : " + g.getText());
-                if(index <8)
-				{
-					ElectrodeGroups[index] = g;
-					index++;
-				}
+                if (index < 8)
+                {
+                    ElectrodeGroups[index] = g;
+                    index++;
+                }
                 /*
 				Debug.Log ("__________________________");
 				Debug.Log ("name is "+name);
@@ -434,7 +322,7 @@ public class EEGDataManager : SeaDataManager
 				*/
             }
         }
-		Debug.Log ("Nombre de groupe : "+index);
+        Debug.Log("Nombre de groupe : " + index);
     }
 
     Dictionary<string, int> reverseDict(Dictionary<int, string> input)
@@ -452,25 +340,9 @@ public class EEGDataManager : SeaDataManager
         return m_transFourrier.GetFT();
     }
 
-    private float[] basseFrequence = new float[4];
-    private float[] hauteFrequence = new float[4];
-    private float[] thetaFrequence = new float[4];
-    private float[] tabTHF = new float[3];
-    private float[] moyenneBasse = new float[4];
-    private float[] moyenneHaute = new float[4];
-    private float[] moyenneTheta = new float[4];
-    private float[] moyenneTHF = new float[3];
-    private float[] ecartTypeBasse = new float[4];
-    private float[] ecartTypeHaute = new float[4];
-    private float[] ecartTypeTheta = new float[4];
-    private float[] ecartTypeTHF = new float[3];
-    //private float[] tabVal = new float[12];
-    private float[] tabVal1 = new float[12];
     private float[] THF = new float[3];
     private float[] THF1 = new float[3];
 
-    private float alphaRadius;
-    private float alphaTHF;
     private float val0 = 0;
     private float val1 = 0;
     private float val2 = 0;
@@ -482,5 +354,5 @@ public class EEGDataManager : SeaDataManager
     private float minGD = 0;
     private float maxGD = 0;
 
-	private Fft m_transFourrier;
+    private Fft m_transFourrier;
 }

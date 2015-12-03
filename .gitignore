@@ -76,3 +76,5 @@ target/
 /merUnity/Assembly-CSharp.csproj
 /merUnity/merUnity.userprefs
 /merUnity/.vs/merUnity/v14/.suo
+/merUnity/ProjectSettings/ProjectSettings.asset
+/merUnity/ProjectSettings/ProjectVersion.txt

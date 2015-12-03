@@ -55,7 +55,7 @@ if __name__ == "__main__":
                     sinVal = 0
 
                 mystr=str(now) + ';'
-                for k in range(1, 5) :
+                for k in range(0, 5) :
                     name = "e" + str(k)
                     val = str(sinVal)
                     if(name != '' and val != '') : mystr += name + ":" + val + ";"

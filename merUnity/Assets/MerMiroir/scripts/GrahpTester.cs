@@ -12,34 +12,50 @@ public class GrahpTester : MonoBehaviour
     {
         GraphManager.Instance.CreateNCurve(1);
         //GraphManager.Instance.CreateNCurve(1);
-        for (int i = 0; i < 64; i++)
+
+
+        f = EEGDataManager.GetFT();
+        signal = EEGDataManager.GetSignal();
+
+        for (int i = 0; i < f[0].Length; i++)
         {
             Curve.AddKey(i, 0);
+        }
+        for (int i = 0; i < signal[0].Length; i++)
+        {
             Signal.AddKey(i, 0);
         }
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (signal.Length < 1)
+            return;
 
         //ClientBehavior.sensorVal[0]++;
-        if (m_index > 63)
+        if (m_index > signal[0].Length - 1)
         {
             f = EEGDataManager.GetFT();
             signal = EEGDataManager.GetSignal();
             m_index = 0;
+
+            for (int i = 0; i < f[0].Length; i++)
+            {
+                Curve.RemoveKey(i);
+                Curve.AddKey(i, f[0][i]);
+            }
+            for (int i = 0; i < signal[0].Length; i++)
+            {
+                Signal.RemoveKey(i);
+                Signal.AddKey(i, signal[0][i]);
+            }
         }
 
         //if (f[m_index]>0.1f) Debug.Log("tests  "+m_index+" ; "+f[m_index]); 
-        for (int i = 0; i < 64; i++)
-        {
-            Curve.RemoveKey(i);
-            Curve.AddKey(i, f[0][i]);
-            Signal.RemoveKey(i);
-            Signal.AddKey(i, signal[0][i]);
-        }
-        GraphManager.Instance.SetCurveValue(0, (float)f[0][m_index++]);
+        GraphManager.Instance.SetCurveValue(0, (float)signal[0][m_index++]);
+        // GraphManager.Instance.SetCurveValue(0, (float)f[0][m_index++]);
 
     }
     float[][] f;

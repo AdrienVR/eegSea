@@ -50,9 +50,9 @@ public class ClientBehavior : MonoBehaviour
         }
     }
 
-    public void StopThread()
+    void OnDisable()
     {
-        m_threadEnabled = false;
+        Disable();
     }
 
     public void Disable() //ferme le thread
@@ -61,6 +61,8 @@ public class ClientBehavior : MonoBehaviour
         Debug.Log("Client have ran for " + dateRunProgram + "seconds and have received " + numberValuesReceived + "dataValues within this time!");
         double frequency = dateRunProgram != 0 ? numberValuesReceived / (dateRunProgram) : 0;
         Debug.Log("Approximate frequency : " + frequency + " Values/seconds");
+
+        m_threadEnabled = false;
 
         if (m_receiveThread != null)
         {

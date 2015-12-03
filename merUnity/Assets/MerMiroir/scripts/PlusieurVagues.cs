@@ -169,11 +169,6 @@ public class PlusieurVagues : MonoBehaviour
 
     }
 
-    void OnDisable()
-    {
-        ClientBehavior.Instance.Disable();
-    }
-
     private float[] tabTHF = new float[3];
     private float[] moyenneTHF = new float[3];
     private float[] ecartTypeTHF = new float[3];

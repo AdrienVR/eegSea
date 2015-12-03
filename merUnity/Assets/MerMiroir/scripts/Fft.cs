@@ -1,11 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
-
 
 public class Fft
 {
-
-    public float[][] testArray = new float[14][];
+    public float[][] signalArray = new float[14][];
     public float[][] elecFreqArray = new float[14][];
 
     static string[] ELECTRODS = new string[14]{"F3","AF3","FC5","F7",
@@ -16,11 +13,11 @@ public class Fft
     {
 
 
-        for (int i = 0; i < testArray.Length; i++)
+        for (int i = 0; i < signalArray.Length; i++)
         {
-            testArray[i] = new float[128];
+            signalArray[i] = new float[128];
             elecFreqArray[i] = new float[64];
-            SetToVal(testArray[i], 0);
+            SetToVal(signalArray[i], 0);
         }
     }
 
@@ -28,15 +25,13 @@ public class Fft
     {
         for (int j = 0; j < 14; j++)
         {
-            for (int i = 0; i < testArray[j].Length - 1; i++)
+            for (int i = 0; i < signalArray[j].Length - 1; i++)
             {
-                testArray[j][i] = testArray[j][i + 1];
+                signalArray[j][i] = signalArray[j][i + 1];
             }
-            testArray[j][testArray[j].Length - 1] = (float)input[j];
+            signalArray[j][signalArray[j].Length - 1] = (float)input[j];
         }
     }
-
-
 
     public float[][] GetFT()
     {
@@ -51,7 +46,7 @@ public class Fft
             float[] Xim = new float[N / 2 + 1]; // DFT of x (real and imaginary parts)
             float[] P = new float[N / 2 + 1];           // power spectrum of x
 
-            x = testArray[j];
+            x = signalArray[j];
 
             int to_sin = 3 * N / 4; // index offset for sin
             int a, b;
@@ -81,7 +76,7 @@ public class Fft
     public float[][] getSignal()
     {
 
-        return testArray;
+        return signalArray;
     }
 
     public void update()

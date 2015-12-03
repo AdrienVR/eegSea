@@ -28,6 +28,8 @@ public class Fft
             signalArray[index][m_currentIndex] = values[index];
         }
         m_currentIndex ++;
+        if (m_currentIndex >= signalArray[0].Length)
+            m_currentIndex = 0;
     }
 
     private int m_currentIndex = 0;

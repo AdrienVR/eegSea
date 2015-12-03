@@ -7,15 +7,16 @@ public class GrahpTester : MonoBehaviour
     public AnimationCurve Curve;
     public AnimationCurve Signal;
 
+    public const float UpdateDelay = 0.1f;
+
     // Use this for initialization
     void Start()
     {
         GraphManager.Instance.CreateNCurve(1);
         //GraphManager.Instance.CreateNCurve(1);
-
-
-        f = EEGDataManager.GetFT();
-        signal = EEGDataManager.GetSignal();
+        
+        MakeDeepCopy(EEGDataManager.GetFT(), ref f);
+        MakeDeepCopy(EEGDataManager.GetSignal(), ref signal);
 
         for (int i = 0; i < f[0].Length; i++)
         {
@@ -31,15 +32,18 @@ public class GrahpTester : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (signal.Length < 1)
+        if (signal == null || signal.Length < 1)
             return;
+
+        m_updateTimer += Time.deltaTime;
 
         //ClientBehavior.sensorVal[0]++;
         if (m_index > signal[0].Length - 1)
         {
-            f = EEGDataManager.GetFT();
-            signal = EEGDataManager.GetSignal();
             m_index = 0;
+            m_updateTimer = 0;
+            MakeDeepCopy(EEGDataManager.GetFT(), ref f);
+            MakeDeepCopy(EEGDataManager.GetSignal(), ref signal);
 
             for (int i = 0; i < f[0].Length; i++)
             {
@@ -53,11 +57,29 @@ public class GrahpTester : MonoBehaviour
             }
         }
 
-        //if (f[m_index]>0.1f) Debug.Log("tests  "+m_index+" ; "+f[m_index]); 
-        GraphManager.Instance.SetCurveValue(0, (float)signal[0][m_index++]);
-        // GraphManager.Instance.SetCurveValue(0, (float)f[0][m_index++]);
+        GraphManager.Instance.SetCurveValue(0, (float)signal[0][m_index]);
 
+        if (m_updateTimer > UpdateDelay)
+        {
+            m_index++;
+        }
     }
+
+    private void MakeDeepCopy(float[][] arrayToCopy, ref float[][] arrayTarget)
+    {
+        arrayTarget = new float[arrayToCopy.Length][];
+
+        for (int i = 0; i < arrayToCopy.Length; i++)
+        {
+            arrayTarget[i] = new float[arrayToCopy[i].Length];
+            for (int j = 0; j < arrayToCopy[i].Length; j++)
+            {
+                arrayTarget[i][j] =  arrayToCopy[i][j];
+            }
+        }
+    }
+
+    private float m_updateTimer;
     float[][] f;
     float[][] signal;
     private int m_index = 64;

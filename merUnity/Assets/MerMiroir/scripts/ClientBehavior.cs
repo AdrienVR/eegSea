@@ -83,12 +83,12 @@ public class ClientBehavior : MonoBehaviour
         {
             IPEndPoint receiver = new IPEndPoint(IPAddress.Any, 0); //spÃ©cification du port et de l'adresse IP a Ã©couter
             byte[] receivedBytes = client.Receive(ref receiver); //rÃ©cÃ©ption de la trame UDP
-            data1 = Encoding.ASCII.GetString(receivedBytes); //transformer la trame en chaine
+            data = Encoding.ASCII.GetString(receivedBytes); //transformer la trame en chaine
 
             //RÃ©ception des donnÃ©es de capteur brutes
             //Format : 4.391409;e1:0;e2:0;e3:0;e4:0;2:-0.146730474455;e3:-0.146730474455;e4:-0.146730474455;74;
             // temps;capteur1:val1;capteur2:val2;capteur3:val3;
-            string[] debuf = data1.Split(new char[] { '|' });
+            string[] debuf = data.Split(new char[] { '|' });
 
             for (int j = 0; j < debuf.Length; j++)
             {
@@ -106,18 +106,12 @@ public class ClientBehavior : MonoBehaviour
                     else
                     {
                         string[] sensorValues = sensorStrings[i].Split(new char[] { ':' });
-                        sensorName[i - 1] = sensorValues[0];
+                        sensorIndex[i - 1] = int.Parse(sensorValues[0]);
                         sensorVal[i - 1] = float.Parse(sensorValues[1], CultureInfo.InvariantCulture.NumberFormat);
                         // transFourrier.addSample(sensorVal);
-                        //Debug.Log("tests input coucou "+sensorVal[0]);
-
-						EEGDataManager.sendTimeSamples(sensorVal);
-
-                        //Debug.Log(sensorValues[0] + " - ");
-                        //Debug.Log(sensorValues[1] + "\n");
-                        Debug.Log(sensorTime.ToString() + " - " + sensorName[i - 1] + " : " + sensorVal[i - 1].ToString() + "\n");
                     }
                 }
+                EEGDataManager.sendTimeSamples(sensorIndex, sensorVal);
                 numberValuesReceived += 1;
             }
         }
@@ -141,15 +135,11 @@ public class ClientBehavior : MonoBehaviour
 
     // Use this for initialization
     private string data = "";
-    private string data1 = "";
     private UdpClient client;
     private int port = 5000;
-    private byte[] receivedBytes;
-    private static string[] sensorName = new string[14];
-    private static double[] sensorVal = new double[14];
-    private static float sensorTime = 0.0f;
-
-    private string lastDataReceived = "No Data";
+    private int[] sensorIndex = new int[14];
+    private float[] sensorVal = new float[14];
+    private float sensorTime = 0.0f;
 
     private float lastTimestampReceived = 0;
     private float timestampStartProgram = 0;

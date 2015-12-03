@@ -55,8 +55,8 @@ if __name__ == "__main__":
                     sinVal = 0
 
                 mystr=str(now) + ';'
-                for k in range(0, 5) :
-                    name = "e" + str(k)
+                for electrodeIndex in range(0, 5) :
+                    name = str(electrodeIndex)
                     val = str(sinVal)
                     if(name != '' and val != '') : mystr += name + ":" + val + ";"
 

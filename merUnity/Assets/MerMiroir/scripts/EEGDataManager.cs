@@ -36,9 +36,9 @@ public class EEGDataManager : SeaDataManager
         return ElectrodeGroups;
     }
 
-    public void sendTimeSamples(double[] sensorVal)
+    public void sendTimeSamples(int[] sensorIndexes, float[] sensorValues)
     {
-        m_transFourrier.addSample(sensorVal);
+        m_transFourrier.addSample(sensorIndexes, sensorValues);
     }
 
     public float[][] GetSignal()

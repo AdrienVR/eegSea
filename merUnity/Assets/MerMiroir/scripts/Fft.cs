@@ -21,17 +21,16 @@ public class Fft
         }
     }
 
-    public void addSample(double[] input)
+    public void addSample(int[] signalIndexes, float[] values)
     {
-        for (int j = 0; j < 14; j++)
+        foreach (int index in signalIndexes)
         {
-            for (int i = 0; i < signalArray[j].Length - 1; i++)
-            {
-                signalArray[j][i] = signalArray[j][i + 1];
-            }
-            signalArray[j][signalArray[j].Length - 1] = (float)input[j];
+            signalArray[index][m_currentIndex] = values[index];
         }
+        m_currentIndex ++;
     }
+
+    private int m_currentIndex = 0;
 
     public float[][] GetFT()
     {

@@ -38,7 +38,7 @@ public class EEGDataManager : SeaDataManager
 
     public void sendTimeSamples(int[] sensorIndexes, float[] sensorValues)
     {
-        m_transFourrier.addSample(sensorIndexes, sensorValues);
+        m_transFourrier.addSample(sensorValues);
     }
 
     public float[][] GetSignal()

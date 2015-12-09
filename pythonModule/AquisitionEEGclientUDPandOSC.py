@@ -9,6 +9,7 @@ import numpy
 import os
 import OSC
 import sys
+import math
 
 
 if __name__ == "__main__":
@@ -35,6 +36,16 @@ if __name__ == "__main__":
     lasttime=inittime
     now=lasttime
 
+    freqSin = 20
+    tSin = 1.0/freqSin
+    timeSin = 0.0
+    sinVal = 0.0
+    bufSize = 10
+
+    buf = ""
+    nbBuf = 0
+
+
     try:
         while True:
             packet = headset.dequeue()
@@ -51,9 +62,9 @@ if __name__ == "__main__":
                     sinVal = 0
 
                 mystr=str(now) + ';'
-                for k in range(1, 5) :
-                    name = str(k[1])
-                    val = str(headset.sensors[k[1]]['value'])
+                for k in range(1, 14) :
+                    name = str(ELECTRODS[k])
+                    val = str(headset.sensors[ELECTRODS[k]]['value'])
                     if(name != '' and val != '') : mystr += name + ":" + val + ";"
 
                 #sock.sendto(mystr,(UDP_IP,UDP_PORT))
@@ -71,6 +82,7 @@ if __name__ == "__main__":
 
             if nbBuf == buf_length :
                 sock.sendto(buf, (UDP_IP,UDP_PORT))
+                print(buf + "\n")
                 nbBuf = 0
                 buf = ""
     except KeyboardInterrupt:

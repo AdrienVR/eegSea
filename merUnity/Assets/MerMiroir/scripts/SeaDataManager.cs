@@ -4,10 +4,13 @@ using System;
 
 public abstract class SeaDataManager : MonoBehaviour
 {
+    public float TMoyenne = 10f;
+    public float TEcartType = 10f;
+
     public abstract WaveDescriptor[] GetWaveDescriptors();
 
     //rugosité de la texture de la mer
-    public abstract float getTHF(string coef1);
+    public abstract float GetTHF(int index);
 
     public abstract float GetOscillationLeft();
 

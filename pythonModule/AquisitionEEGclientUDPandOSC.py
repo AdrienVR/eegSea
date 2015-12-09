@@ -54,17 +54,13 @@ if __name__ == "__main__":
 
             if now-lasttime > udp_period :
                 # Envoi UDP des tensions d'électrode
-                timeSin += udp_period
-                if timeSin < tSin :
-                    sinVal = math.sin(2.0*math.pi*timeSin/tSin)
-                else :
-                    timeSin = 0
-                    sinVal = 0
-
                 mystr=str(now) + ';'
                 for k in range(1, 14) :
                     name = str(ELECTRODS[k])
-                    val = str(headset.sensors[ELECTRODS[k]]['value'])
+                    if headset.sensors[ELECTRODS[k]]['quality'] >= MINQ :
+                        val = str(headset.sensors[ELECTRODS[k]]['value'])
+                    else :
+                        val = '0'
                     if(name != '' and val != '') : mystr += name + ":" + val + ";"
 
                 #sock.sendto(mystr,(UDP_IP,UDP_PORT))

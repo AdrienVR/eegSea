@@ -20,6 +20,7 @@ public class EEGDataManager : SeaDataManager
 
 	//[HideInInspector]
 	public Group[] ElectrodeGroups = new Group[8];
+	public Group[] ThfElectrodes = new Group[3];
 
 
     void Awake()
@@ -205,7 +206,7 @@ public class EEGDataManager : SeaDataManager
 
     public override float GetTHF(int coef)
     {
-        return m_thfElectrodes[coef].GetRadius();
+        return ThfElectrodes[coef].GetRadius();
     }
 
     public void ResetValues()
@@ -357,23 +358,62 @@ public class EEGDataManager : SeaDataManager
 
 		// GROUPS FOR TEXTURES :
 		lastMatching = -1;
+		if (GroupForTextureW == null)
+			GroupForTextureW = "default";
+		if (GroupForTextureY == null)
+			GroupForTextureY = "default";
+		if (GroupForTextureZ == null)
+			GroupForTextureZ = "default";
 		if(names.Contains(GroupForTextureW.ToLower()))
 		{
 			int indexGroup = groups[GroupForTextureW.ToLower()];
 			lastMatching = indexGroup;
-			//GROUPE POUR W = m_allGroups[indexGroup];;
+			ThfElectrodes[0] = m_allGroups[indexGroup];;
 		}
 		else
 		{
 			Debug.LogError("Group '"+GroupForTextureW+"' is not present in Xml files.");
-			/*
 			if(lastMatching>=0)
-				//GROUPE POUR W = m_allGroups[lastMatching];
+				ThfElectrodes[0] = m_allGroups[lastMatching];
 			else
 			{
-				//GROUPE POUR W = m_allGroups[0];
-				//Debug.LogError("'"+GroupForTextureW+"' have been replaced by '"+GROUPE POUR W.getName()+"' for wave "+index+".");
-			}*/
+				ThfElectrodes[0] = m_allGroups[0];
+				Debug.LogError("'"+GroupForTextureW+"' have been replaced by '"+ThfElectrodes[0].getName()+"' for texture W");
+			}
+		}
+		if(names.Contains(GroupForTextureY.ToLower()))
+		{
+			int indexGroup = groups[GroupForTextureY.ToLower()];
+			lastMatching = indexGroup;
+			ThfElectrodes[1] = m_allGroups[indexGroup];;
+		}
+		else
+		{
+			Debug.LogError("Group '"+GroupForTextureY+"' is not present in Xml files.");
+			if(lastMatching>=0)
+				ThfElectrodes[1] = m_allGroups[lastMatching];
+			else
+			{
+				ThfElectrodes[1] = m_allGroups[0];
+				Debug.LogError("'"+GroupForTextureY+"' have been replaced by '"+ThfElectrodes[1].getName()+"' for texture Y");
+			}
+		}
+		if(names.Contains(GroupForTextureZ.ToLower()))
+		{
+			int indexGroup = groups[GroupForTextureZ.ToLower()];
+			lastMatching = indexGroup;
+			ThfElectrodes[2] = m_allGroups[indexGroup];;
+		}
+		else
+		{
+			Debug.LogError("Group '"+GroupForTextureZ+"' is not present in Xml files.");
+			if(lastMatching>=0)
+				ThfElectrodes[2] = m_allGroups[lastMatching];
+			else
+			{
+				ThfElectrodes[2] = m_allGroups[0];
+				Debug.LogError("'"+GroupForTextureZ+"' have been replaced by '"+ThfElectrodes[2].getName()+"' for texture Z");
+			}
 		}
 	}
 	
@@ -393,12 +433,7 @@ public class EEGDataManager : SeaDataManager
         return m_transFourrier.GetFT();
     }
 
-<<<<<<< HEAD
 	private List<Group> m_allGroups;
-=======
-    private Group[] m_thfElectrodes;
->>>>>>> 711a03919b68dd142c5f97db630e80943f9089d6
-
     private float[] THF = new float[3];
     private float[] THF1 = new float[3];
 

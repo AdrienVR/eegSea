@@ -143,7 +143,7 @@ public class PlusieurVagues : MonoBehaviour
         SeaManager.SetWavesAmount(amount);
         SeaManager.SetWindDirection(windDir);
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 3; i++)
         {
             tabTHF[i] = SeaDataManager.GetTHF(i);
         }

@@ -31,7 +31,6 @@ public class SeaManager : MonoBehaviour
             waveParameter.radius *= (1 - alpha);
             waveParameter.radius += alpha * r;
             SetWaveParameters(i, waveParameter);
-            //m_waveDescriptors[i].UpdateRadius();// = waveParameter.radius;
         }
     }
 

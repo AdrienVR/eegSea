@@ -121,6 +121,18 @@ public class PlusieurVagues : MonoBehaviour
             vague.advance = parametres.advance;
             vague.transform.parent = transform;
             SeaManager.SetWaveParameters(i, parametres);
+
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            if (i < 3)
+            {
+                tabTHF[i] = -40f;
+                moyenneTHF[i] = 0f;
+                ecartTypeTHF[i] = 1f;
+                THF[i] = 0.1f;
+                THF1[i] = 0.1f;
+            }
         }
         vagues = gameObject.GetComponentsInChildren<Vague>();
     }
@@ -131,11 +143,18 @@ public class PlusieurVagues : MonoBehaviour
         SeaManager.SetWavesAmount(amount);
         SeaManager.SetWindDirection(windDir);
 
+        for (int i = 0; i < 4; i++)
+        {
+            tabTHF[i] = SeaDataManager.GetTHF(i);
+        }
+
+        UpdateTHF();
+
         //change les coefs des vagues hautes fréquences (texture)
         Vector4 thfs;
-        thfs.y = SeaDataManager.getTHF(coef1);
-        thfs.z = SeaDataManager.getTHF(coef2);
-        thfs.w = SeaDataManager.getTHF(coef3);
+        thfs.y = THF1[0];
+        thfs.z = THF1[1];
+        thfs.w = THF1[2];
         thfs.x = Mathf.Max(thfs.y, Mathf.Max(thfs.z, thfs.w));
         thfs.y *= 1f / maxTHF; thfs.z *= 0.75f / maxTHF; thfs.w *= 0.5f / maxTHF;
         // for the shader version 3
@@ -147,6 +166,62 @@ public class PlusieurVagues : MonoBehaviour
         SeaManager.SetCoeffsHF(thfs);
 
         //Client.displayValues();
+    }
+
+    void UpdateTHF()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            //tabTHF[i];
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (i < 3)
+            {
+                moyenneTHF[i] = EstimationMoyenne(Time.deltaTime / SeaDataManager.TMoyenne, moyenneTHF[i], tabTHF[i]);
+                ecartTypeTHF[i] = EstimationEcartType(Time.deltaTime / SeaDataManager.TEcartType, ecartTypeTHF[i], moyenneTHF[i], tabTHF[i]);
+            }
+        }
+    }
+
+    //estimation de l'écart type à l'instant t en tenant compte de l'écart type précédent
+    private float EstimationEcartType(float alpha, float ecartType, float moyenne, float lastValue)
+    {
+        if (lastValue <= 0)
+        {
+            val1 = 0;
+            val2 = 0;
+            return ecartType; // on conserve la dernière valeur calculée
+        }
+        if (val1 == 0)
+        { // lastvalue>0 pour la première fois
+            val1 = lastValue;
+            return ecartType; // on conserve la dernière valeur calculée
+        }
+        if (val2 == 0)
+        { // lastvalue>0 pour la seconde fois
+            val2 = lastValue;
+            return Mathf.Abs(val2 - val1); // première estimation possible
+        }
+        return ((1f - alpha) * ecartType + alpha * Mathf.Abs(lastValue - moyenne));
+    }
+    
+    private float val1 = 0;
+    private float val2 = 0;
+
+    private float EstimationMoyenne(float alpha, float moyenne, float lastValue) //estimation d'une moyenne à l'instant t en tenant compte de la moyenne précédente
+    {
+        if (lastValue <= 0)
+        { // mesure non valable
+            lastValue = 0f;
+            return 0f;
+        }
+        if (lastValue == 0f)
+        { // première valeur acceptable pour lastValue
+            return lastValue;
+        }
+        return ((1f - alpha) * moyenne + alpha * lastValue);
     }
 
     public void CalculTHF(float maxTHF)

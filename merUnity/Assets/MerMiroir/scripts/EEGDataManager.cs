@@ -5,7 +5,6 @@ using System.Xml;
 
 public class EEGDataManager : SeaDataManager
 {
-    public float TMoyenne, TEcartType;
 
     public float alphaRadius; // pourcentage de la période des vagues pour temps moyen de maj des hauteurs
     public float alphaTHF; // temps moyen de maj pour le coeff du bumpmap (texture des vagues de hautes fréquences)
@@ -129,27 +128,6 @@ public class EEGDataManager : SeaDataManager
         return Mathf.Sqrt(ecartType);
     }
 
-    private float EstimationEcartType(float alpha, float ecartType, float moyenne, float lastValue) //estimation de l'écart type à l'instant t en tenant compte de l'écart type précédent
-    {
-        if (lastValue <= 0)
-        {
-            val1 = 0;
-            val2 = 0;
-            return ecartType; // on conserve la dernière valeur calculée
-        }
-        if (val1 == 0)
-        { // lastvalue>0 pour la première fois
-            val1 = lastValue;
-            return ecartType; // on conserve la dernière valeur calculée
-        }
-        if (val2 == 0)
-        { // lastvalue>0 pour la seconde fois
-            val2 = lastValue;
-            return Mathf.Abs(val2 - val1); // première estimation possible
-        }
-        return ((1f - alpha) * ecartType + alpha * Mathf.Abs(lastValue - moyenne));
-    }
-
     public static float getAmount()
     {
         return 1f;
@@ -214,16 +192,9 @@ public class EEGDataManager : SeaDataManager
         return new float[] { 0, 0 };// moyenneHaute;
     }
 
-    public override float getTHF(string coef)
+    public override float GetTHF(int coef)
     {
-        if (coef == "THF1")
-            return THF[0];
-        if (coef == "THF2")
-            return THF[1];
-        if (coef == "THF3")
-            return THF[2];
-        return 1f; //valeur par défaut
-
+        return m_thfElectrodes[coef].GetRadius();
     }
 
     public void ResetValues()
@@ -338,6 +309,8 @@ public class EEGDataManager : SeaDataManager
     {
         return m_transFourrier.GetFT();
     }
+
+    private Group[] m_thfElectrodes;
 
     private float[] THF = new float[3];
     private float[] THF1 = new float[3];

@@ -47,13 +47,9 @@ public class EEGDataManager : SeaDataManager
         return ElectrodeGroups;
     }
 
-    public void sendTimeSamples(int[] sensorIndexes, float[] sensorValues)
+    public void sendTimeSamples(float[] sensorValues)
     {
         m_transFourrier.addSample(sensorValues);
-        foreach (Group group in ElectrodeGroups)
-        {
-            group.MAJmoyenneEcartType(Time.deltaTime);
-        }
     }
 
     public void UpdateFFT()

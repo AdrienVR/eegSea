@@ -5,16 +5,22 @@ using System.Xml;
 
 public class EEGDataManager : SeaDataManager
 {
-    public float TMoyenne, TEcartType;
 
     public float alphaRadius; // pourcentage de la période des vagues pour temps moyen de maj des hauteurs
     public float alphaTHF; // temps moyen de maj pour le coeff du bumpmap (texture des vagues de hautes fréquences)
 
     public float Delta { get { return maxGD - minGD; } }
+	
+	public string[] GroupsForWaves = new string[8];
+	public string GroupForTextureW;
+	public string GroupForTextureY;
+	public string GroupForTextureZ;
 
-    public Group[] ElectrodeGroups = new Group[8];
+    public float memAlphaRadius;
 
-    float memAlphaRadius;
+	//[HideInInspector]
+	public Group[] ElectrodeGroups = new Group[8];
+
 
     void Awake()
     {
@@ -28,7 +34,11 @@ public class EEGDataManager : SeaDataManager
         Initialize(alphaRadius, alphaTHF); //Appeler init une seulf fois dans le programme	//Given param: alpha radius & alpha THF
 
         // Initialisation des groupes depuis les fichiers .xml
+		m_allGroups = new List<Group> ();
         InitGroups();
+
+		// Selection des groupes suivant les infos saisies par l'utilisateur dans UnityEditor
+		SortGroups ();
     }
 
     public override WaveDescriptor[] GetWaveDescriptors()
@@ -129,27 +139,6 @@ public class EEGDataManager : SeaDataManager
         return Mathf.Sqrt(ecartType);
     }
 
-    private float EstimationEcartType(float alpha, float ecartType, float moyenne, float lastValue) //estimation de l'écart type à l'instant t en tenant compte de l'écart type précédent
-    {
-        if (lastValue <= 0)
-        {
-            val1 = 0;
-            val2 = 0;
-            return ecartType; // on conserve la dernière valeur calculée
-        }
-        if (val1 == 0)
-        { // lastvalue>0 pour la première fois
-            val1 = lastValue;
-            return ecartType; // on conserve la dernière valeur calculée
-        }
-        if (val2 == 0)
-        { // lastvalue>0 pour la seconde fois
-            val2 = lastValue;
-            return Mathf.Abs(val2 - val1); // première estimation possible
-        }
-        return ((1f - alpha) * ecartType + alpha * Mathf.Abs(lastValue - moyenne));
-    }
-
     public static float getAmount()
     {
         return 1f;
@@ -214,16 +203,9 @@ public class EEGDataManager : SeaDataManager
         return new float[] { 0, 0 };// moyenneHaute;
     }
 
-    public override float getTHF(string coef)
+    public override float GetTHF(int coef)
     {
-        if (coef == "THF1")
-            return THF[0];
-        if (coef == "THF2")
-            return THF[1];
-        if (coef == "THF3")
-            return THF[2];
-        return 1f; //valeur par défaut
-
+        return m_thfElectrodes[coef].GetRadius();
     }
 
     public void ResetValues()
@@ -302,12 +284,7 @@ public class EEGDataManager : SeaDataManager
                 Group g = new Group(name, elecsInt, int.Parse(f_min), int.Parse(f_max));
                 g.setMoyenne(TMoyenne);
                 g.setEcartType(TEcartType);
-                Debug.Log("Import group : " + g.getText());
-                if (index < 8)
-                {
-                    ElectrodeGroups[index] = g;
-                    index++;
-                }
+				m_allGroups.Add(g);
                 /*
 				Debug.Log ("__________________________");
 				Debug.Log ("name is "+name);
@@ -321,8 +298,85 @@ public class EEGDataManager : SeaDataManager
 				*/
             }
         }
-        Debug.Log("Nombre de groupe : " + index);
     }
+
+	public void SortGroups()
+	{
+		Dictionary<string, int> groups = new Dictionary<string, int> ();
+		int index = 0;
+		foreach(Group g in m_allGroups)
+		{
+			groups.Add(g.getName().ToLower(), index);
+			index++;
+		}
+		List<string> names = new List<string> ();
+		foreach(string key in groups.Keys)
+		{
+			names.Add(key.ToString());
+		}
+		index = 0;
+		int lastMatching = -1;
+		foreach(string s in GroupsForWaves)
+		{
+			if(index<8)
+			{
+				if(names.Contains(s.ToLower()))
+				{
+					int indexGroup = groups[s.ToLower()];
+					lastMatching = indexGroup;
+					Group matchingGroup = m_allGroups[indexGroup];
+					ElectrodeGroups[index] = matchingGroup;
+				}
+				else
+				{
+					Debug.LogError("Group '"+s+"' is not present in Xml files.");
+					if(lastMatching>=0)
+					{
+						ElectrodeGroups[index] = m_allGroups[lastMatching];
+					}
+					else
+					{
+						ElectrodeGroups[index] = m_allGroups[0];
+					}
+					Debug.LogError("'"+s+"' have been replaced by '"+ElectrodeGroups[index].getName()+"' for wave "+index+".");
+				}
+				index++;
+			}
+		}
+		for(int i=index; i < 8; i++)
+		{
+			if(lastMatching>=0)
+			{
+				ElectrodeGroups[i] = m_allGroups[lastMatching];
+			}
+			else
+			{
+				ElectrodeGroups[i] = m_allGroups[0];
+			}
+		}
+
+		// GROUPS FOR TEXTURES :
+		lastMatching = -1;
+		if(names.Contains(GroupForTextureW.ToLower()))
+		{
+			int indexGroup = groups[GroupForTextureW.ToLower()];
+			lastMatching = indexGroup;
+			//GROUPE POUR W = m_allGroups[indexGroup];;
+		}
+		else
+		{
+			Debug.LogError("Group '"+GroupForTextureW+"' is not present in Xml files.");
+			/*
+			if(lastMatching>=0)
+				//GROUPE POUR W = m_allGroups[lastMatching];
+			else
+			{
+				//GROUPE POUR W = m_allGroups[0];
+				//Debug.LogError("'"+GroupForTextureW+"' have been replaced by '"+GROUPE POUR W.getName()+"' for wave "+index+".");
+			}*/
+		}
+	}
+	
 
     Dictionary<string, int> reverseDict(Dictionary<int, string> input)
     {
@@ -338,6 +392,12 @@ public class EEGDataManager : SeaDataManager
     {
         return m_transFourrier.GetFT();
     }
+
+<<<<<<< HEAD
+	private List<Group> m_allGroups;
+=======
+    private Group[] m_thfElectrodes;
+>>>>>>> 711a03919b68dd142c5f97db630e80943f9089d6
 
     private float[] THF = new float[3];
     private float[] THF1 = new float[3];

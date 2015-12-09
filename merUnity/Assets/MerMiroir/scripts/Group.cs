@@ -47,7 +47,7 @@ public class Group : WaveDescriptor
             float electrodeEnergy = 0;
             for (int frequency = m_FreqMin; frequency <= m_FreqMax; frequency++)
             {
-                electrodeEnergy += sensorVal[electrodeIndex][frequency];
+                electrodeEnergy += sensorVal[electrodeIndex - 1][frequency];
             }
             totalEnergy += electrodeEnergy;
         }

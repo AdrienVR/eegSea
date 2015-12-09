@@ -21,7 +21,7 @@ if __name__ == "__main__":
                'F4','AF4','FC6','F8',
                'T7','P7','O1',
                'T8','P8','O2'] # list of EEG electrods names
-    MINQ = 0 # qualité minimale du signal exigée (1 c'est bien, avec 0 tout passe même si le casque n'est pas sur la tête)
+    MINQ = 1 # qualité minimale du signal exigée (1 c'est bien, avec 0 tout passe même si le casque n'est pas sur la tête)
     # ouverture de la socket UDP
     sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
     UDP_IP = "127.0.0.1"    # adresse IP de la machine avec mer unity

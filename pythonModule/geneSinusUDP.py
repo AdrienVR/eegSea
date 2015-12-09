@@ -17,11 +17,11 @@ if __name__ == "__main__":
     MINQ = 0
 
     #Paramétrage du sinus (fréquence en Hz)
-    freqSin = 20
+    freqSin = 0.6
     tSin = 1.0/freqSin
     timeSin = 0.0
     sinVal = 0.0
-    bufSize = 10
+    bufSize = 1
 
     # ouverture de la socket UDP
     sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)

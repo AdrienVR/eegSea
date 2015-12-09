@@ -50,7 +50,7 @@ public class PlusieurVagues : MonoBehaviour
     {
         SeaManager.SetWindDirection(windDir);
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 3; i++)
         {
             tabTHF[i] = SeaDataManager.GetTHF(i);
         }

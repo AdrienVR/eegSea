@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<config>
+	<group>
+		<name>configtest</name>
+		<f_min>4</f_min>
+		<f_max>10</f_max>
+		<electrodes_list>
+			<electrode>O2</electrode>
+			<electrode>P8</electrode>
+			<electrode>P7</electrode>
+			<electrode>FC5</electrode>
+			<electrode>F4</electrode>
+		</electrodes_list>
+	</group>
+	<group>
+		<name>CONFIG2</name>
+		<f_min>36</f_min>
+		<f_max>42</f_max>
+		<electrodes_list>
+			<electrode>O2</electrode>
+			<electrode>P8</electrode>
+			<electrode>T8</electrode>
+		</electrodes_list>
+	</group>
+</config>

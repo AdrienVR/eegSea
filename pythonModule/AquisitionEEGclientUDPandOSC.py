@@ -57,8 +57,8 @@ if __name__ == "__main__":
                 mystr=str(now) + ';'
                 for k in range(1, 14) :
                     name = str(ELECTRODS[k])
-                    if headset.sensors[ELECTRODS[k]]['quality'] >= MINQ :
-                        val = str(headset.sensors[ELECTRODS[k]]['value'])
+                    if packet.sensors[ELECTRODS[k]]['quality'] >= MINQ :
+                        val = str(packet.sensors[ELECTRODS[k]]['value'])
                     else :
                         val = '0'
                     if(name != '' and val != '') : mystr += name + ":" + val + ";"

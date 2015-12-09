@@ -16,113 +16,22 @@ public class PlusieurVagues : MonoBehaviour
     // public bool debug;
 
     public float maxTHF = 1f; // coeff pour le bump map
-    public string coef1 = "THF1"; // choix des fréquences gamma pour bump map 1
-    public string coef2 = "THF2"; // choix des fréquences gamma pour bump map 2
-    public string coef3 = "THF3"; // choix des fréquences gamma pour bump map 3
 
     float memAlphaTHF;
 
-    public WaveParameter[] parametresVagues = new WaveParameter[8];
-
-    Vague[] vagues;
     //PerlinVague[] perlinVagues;
-    public float amount;
     public Vague prefabVague;
     public GameObject targetGameObject;
 
     public int numberOfWavesToUse = 8;
 
-    public Vector3 CalculeImage(Vector3 startPoint)
-    {
-
-        Vector3 position = startPoint;
-        foreach (Vague vague in vagues)
-        {
-            if (vague.gameObject.activeInHierarchy)
-            {
-                position += vague.CalculeVecteur(startPoint, amount);
-            }
-        }
-        //foreach (PerlinVague perlinVague in perlinVagues) {
-        //	if (perlinVague.gameObject.activeInHierarchy) {
-        //		position.y = position.y + perlinVague.CalculeHauteur(startPoint,amount);
-        //	}
-        //}
-        return position;
-    }
-
-    public void CalculeImage(Vector3 startPoint, out Vector3 imagePoint, out Vector3 normal, out Vector4 tangentX)
-    {
-        imagePoint = startPoint;
-        Vector3 slopes = new Vector3();
-        Vector3 vecteur = new Vector3();
-        Vector3 oneNormal = new Vector3();
-        Vector3 oneSlope = new Vector3();
-        foreach (Vague vague in vagues)
-        {
-            if (vague.gameObject.activeInHierarchy)
-            {
-                vague.CalculeVecteur(startPoint, out vecteur, out oneNormal, amount);
-                imagePoint += vecteur;
-                oneSlope.x = -oneNormal.x / oneNormal.y;
-                oneSlope.y = 0.0f;
-                oneSlope.z = -oneNormal.z / oneNormal.y;
-                slopes += oneSlope;
-            }
-        }
-        //TODO : calculer la normale ou la pente des perlinVagues
-        //foreach (PerlinVague perlinVague in perlinVagues) {
-        //	if (perlinVague.gameObject.activeInHierarchy) {
-        //		imagePoint.y = imagePoint.y + perlinVague.CalculeHauteur(startPoint,amount);
-        //	}
-        //}
-
-        normal.x = -slopes.x;
-        normal.y = 1.0f;
-        normal.z = -slopes.z;
-        normal.Normalize();
-
-        //tangentX.x = 1.0f;
-        //tangentX.y = slopes.z+slopes.x;
-        //tangentX.z = 1.0f;
-
-        tangentX.x = 1.0f;
-        tangentX.y = slopes.x;
-        tangentX.z = 0.0f;
-        tangentX.w = 1.0f;
-        tangentX.Normalize();
-    }
-
-    // Use this for initialization
-    Vague vague;
 
     void Start()
     {
         SeaManager.SetWaveDescriptors(SeaDataManager.GetWaveDescriptors());
-
-        SeaManager.SetWavesAmount(amount);
+        
         SeaManager.SetWindDirection(windDir);
 
-        for (int i = 0; i < Mathf.Min(parametresVagues.Length, numberOfWavesToUse); ++i)
-        {
-            WaveParameter parametres = parametresVagues[i];
-            //new child vague game object
-            vague = Instantiate(prefabVague, Vector3.zero, Quaternion.identity) as Vague;
-            vague.transform.Rotate(Vector3.up * parametres.angle);
-            vague.waveLenght = parametres.waveLenght;
-            parametres.period = Mathf.Sqrt(vague.waveLenght / 1.6f);
-            vague.period = parametres.period;
-            vague.radius = parametres.radius;
-            if (parametres.density > 1) parametres.density = 1f;
-            if (parametres.density <= 0) parametres.density = 0.001f;
-            vague.density = parametres.density;
-            if (parametres.advance > Mathf.PI / 2) parametres.advance = Mathf.PI / 2;
-            if (parametres.advance < 0) parametres.advance = 0;
-            vague.advance = parametres.advance;
-            vague.transform.parent = transform;
-            SeaManager.SetWaveParameters(i, parametres);
-
-        }
         for (int i = 0; i < 4; i++)
         {
             if (i < 3)
@@ -134,13 +43,11 @@ public class PlusieurVagues : MonoBehaviour
                 THF1[i] = 0.1f;
             }
         }
-        vagues = gameObject.GetComponentsInChildren<Vague>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        SeaManager.SetWavesAmount(amount);
         SeaManager.SetWindDirection(windDir);
 
         for (int i = 0; i < 4; i++)
@@ -164,6 +71,8 @@ public class PlusieurVagues : MonoBehaviour
         SeaManager.SetCoefHF(thfs.w, "3");
         // for the shader version 4
         SeaManager.SetCoeffsHF(thfs);
+
+
 
         //Client.displayValues();
     }

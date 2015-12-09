@@ -29,7 +29,8 @@ public class SeaManager : MonoBehaviour
         {
             WaveParameter parametres = WaveParameters[i];
             //new child vague game object
-            vague = Instantiate(WavePrefab, Vector3.zero, Quaternion.identity) as Vague;
+            GameObject go = Instantiate(WavePrefab);
+            vague = go.GetComponent<Vague>();
             vague.transform.Rotate(Vector3.up * parametres.angle);
             vague.waveLenght = parametres.waveLenght;
             parametres.period = Mathf.Sqrt(vague.waveLenght / 1.6f);

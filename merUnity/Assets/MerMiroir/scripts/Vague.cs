@@ -14,7 +14,8 @@ public class Vague : MonoBehaviour {
 		return ((n * 12456 + 1234) % 10000) * 0.0001f;
 	}
 	
-	float instantPhase(float theta) {
+	float instantPhase(float theta)
+    {
 		theta*=0.159154943f;
 		theta+=0.25f;
 		return 4*Mathf.Abs((theta)-Mathf.Floor(theta)-0.5f)-1f;

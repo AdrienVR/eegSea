@@ -10,6 +10,7 @@ public class ClientBehavior : MonoBehaviour
 {
 
     public EEGDataManager EEGDataManager;
+    public bool first;
 
     // Singleton
     public static ClientBehavior Instance;
@@ -88,29 +89,41 @@ public class ClientBehavior : MonoBehaviour
             //RÃ©ception des donnÃ©es de capteur brutes
             //Format : 4.391409;e1:0;e2:0;e3:0;e4:0;2:-0.146730474455;e3:-0.146730474455;e4:-0.146730474455;74;
             // temps;capteur1:val1;capteur2:val2;capteur3:val3;
-            string[] debuf = data.Split(new char[] { '|' });
 
-            for (int j = 0; j < debuf.Length; j++)
+            string[] debuf = data.Split(new char[] { '|' });
+            //Debug.Log("Data : " + data);
+            //Debug.Log("Nb elements dans le buffer : " + debuf.Length.ToString());
+            for (int j = 0; j < debuf.Length-1; j++)
             {
+
                 string[] sensorStrings = debuf[j].Split(new char[] { ';' }); ;
-                bool first = true;
+                first = true;
+                //Debug.Log("Nb electrodes dans le paquet : " + sensorStrings.Length.ToString());
                 for (int i = 0; i < sensorStrings.Length - 1; i++)
                 {
+                    //Debug.Log("Electrode " + i.ToString());
                     //Information de temps en premiÃ¨re position
                     if (first)
                     {
                         sensorTime = float.Parse(sensorStrings[0], CultureInfo.InvariantCulture.NumberFormat);
+                        //Debug.Log("Lecture du temps : " + sensorTime.ToString());
                         first = false;
                     }
                     //Noms et valeurs de capteurs ensuite
                     else
                     {
                         string[] sensorValues = sensorStrings[i].Split(new char[] { ':' });
-                        sensorIndex[i - 1] = int.Parse(sensorValues[0]);
+                        //Debug.Log("Elec : " + sensorValues[0] + " --- Val : " + sensorValues[1]);
+                        sensorIndex[i - 1] = i;//int.Parse(sensorValues[0]);
                         sensorVal[i - 1] = float.Parse(sensorValues[1], CultureInfo.InvariantCulture.NumberFormat);
+                        //Debug.Log("Valeurs lues : " + sensorIndex[i-1].ToString() + "  -  " + sensorVal[i-1].ToString());
                         // transFourrier.addSample(sensorVal);
                     }
+                    int remaining = sensorStrings.Length - i;
+                    //Debug.Log("Reste " + remaining.ToString() + " électrodes à traiter");
                 }
+                //Debug.Log(sensorIndex);
+                //Debug.Log(sensorVal);
                 EEGDataManager.sendTimeSamples(sensorIndex, sensorVal);
                 numberValuesReceived += 1;
             }

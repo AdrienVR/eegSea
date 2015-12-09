@@ -20,7 +20,6 @@ public class PlusieurVagues : MonoBehaviour
     float memAlphaTHF;
 
     //PerlinVague[] perlinVagues;
-    public Vague prefabVague;
     public GameObject targetGameObject;
 
     public int numberOfWavesToUse = 8;

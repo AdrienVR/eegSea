@@ -141,7 +141,7 @@ public class SkullMenu : MonoBehaviour
 	public void Valid()
 	{
 		// Ecriture du fichier XML correspondant
-		string path = "Assets/MerMiroir/Config/config" + System.DateTime.Now.ToString ().Replace ('/', '_').Replace (' ', '_').Replace (':', '_') + ".xml";
+		string path = Path.Combine(folder, "config" + System.DateTime.Now.ToString ().Replace ('/', '_').Replace (' ', '_').Replace (':', '_') + ".xml");
 		XmlWriter writer = new XmlWriter (path);
 		writer.WriteStartDocument ();
 		writer.WriteStartElement ("config");

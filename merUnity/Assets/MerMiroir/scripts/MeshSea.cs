@@ -85,7 +85,7 @@ public class MeshSea : MonoBehaviour {
 			Vector3 normal = new Vector3();
 			Vector4 tangentX = new Vector4();
 			Vector3 absoluteVertex = vertices[i]+transform.position;
-			vagues.CalculeImage(absoluteVertex, out verticesImages[i], out normal, out tangentX);
+            vagues.SeaManager.CalculeImage(absoluteVertex, out verticesImages[i], out normal, out tangentX);
 			verticesImages[i] = transform.InverseTransformPoint(verticesImages[i]);
 			Color color = Color.gray;
 		    Vector3 cross = Vector3.Cross(normal,Vector3.up);

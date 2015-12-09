@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<config>
+	<group>
+		<name>lundi</name>
+		<f_min>36</f_min>
+		<f_max>42</f_max>
+		<electrodes_list>
+			<electrode>O2</electrode>
+			<electrode>P8</electrode>
+			<electrode>T8</electrode>
+			<electrode>P7</electrode>
+			<electrode>O1</electrode>
+			<electrode>FC6</electrode>
+			<electrode>FC5</electrode>
+			<electrode>T7</electrode>
+			<electrode>F7</electrode>
+			<electrode>AF3</electrode>
+			<electrode>F3</electrode>
+			<electrode>F4</electrode>
+			<electrode>AF4</electrode>
+			<electrode>F8</electrode>
+		</electrodes_list>
+	</group>
+	<group>
+		<name>mardi</name>
+		<f_min>1</f_min>
+		<f_max>2</f_max>
+		<electrodes_list>
+			<electrode>O1</electrode>
+			<electrode>P7</electrode>
+			<electrode>T7</electrode>
+		</electrodes_list>
+	</group>
+</config>

@@ -127,6 +127,7 @@ public class ClientBehavior : MonoBehaviour
                 EEGDataManager.sendTimeSamples(sensorIndex, sensorVal);
                 numberValuesReceived += 1;
             }
+            EEGDataManager.UpdateFFT();
         }
         catch (Exception Err)
         {

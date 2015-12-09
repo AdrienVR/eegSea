@@ -50,6 +50,19 @@ public class EEGDataManager : SeaDataManager
     public void sendTimeSamples(int[] sensorIndexes, float[] sensorValues)
     {
         m_transFourrier.addSample(sensorValues);
+        foreach (Group group in ElectrodeGroups)
+        {
+            group.MAJmoyenneEcartType(Time.deltaTime);
+        }
+    }
+
+    public void UpdateFFT()
+    {
+        float[][] fft = m_transFourrier.GetFT();
+        foreach (Group group in ElectrodeGroups)
+        {
+            group.UpdateRadius(fft);
+        }
     }
 
     public float[][] GetSignal()

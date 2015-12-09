@@ -8,6 +8,10 @@ public class SeaManager : MonoBehaviour
 
     public float AlphaRadius;
 
+    public GameObject WavePrefab;
+
+    public float amount = 1;
+
     // Use this for initialization
     void Awake ()
     {
@@ -18,6 +22,30 @@ public class SeaManager : MonoBehaviour
             Debug.LogError("The SeaRenderer associated doesn't have the right Material Shader");
             gameObject.SetActive(false);
         }
+
+        if (m_seaMaterial.HasProperty("_WavesAmount")) m_seaMaterial.SetFloat("_WavesAmount", amount);
+
+        for (int i = 0; i < WaveParameters.Length; ++i)
+        {
+            WaveParameter parametres = WaveParameters[i];
+            //new child vague game object
+            vague = Instantiate(WavePrefab, Vector3.zero, Quaternion.identity) as Vague;
+            vague.transform.Rotate(Vector3.up * parametres.angle);
+            vague.waveLenght = parametres.waveLenght;
+            parametres.period = Mathf.Sqrt(vague.waveLenght / 1.6f);
+            vague.period = parametres.period;
+            vague.radius = parametres.radius;
+            if (parametres.density > 1) parametres.density = 1f;
+            if (parametres.density <= 0) parametres.density = 0.001f;
+            vague.density = parametres.density;
+            if (parametres.advance > Mathf.PI / 2) parametres.advance = Mathf.PI / 2;
+            if (parametres.advance < 0) parametres.advance = 0;
+            vague.advance = parametres.advance;
+            vague.transform.parent = transform;
+
+        }
+
+        vagues = gameObject.GetComponentsInChildren<Vague>();
     }
 
     // Update is called once per frame
@@ -31,6 +59,11 @@ public class SeaManager : MonoBehaviour
             waveParameter.radius *= (1 - alpha);
             waveParameter.radius += alpha * r;
             SetWaveParameters(i, waveParameter);
+        }
+
+        for (int i = 0; i < WaveParameters.Length; ++i)
+        {
+            vagues[i].radius = WaveParameters[i].radius;
         }
     }
 
@@ -87,9 +120,8 @@ public class SeaManager : MonoBehaviour
         }
     }
 
-    public void SetWavesAmount(float amount)
+    public void SetWavesAmount()
     {
-        if (m_seaMaterial.HasProperty("_WavesAmount")) m_seaMaterial.SetFloat("_WavesAmount", amount);
     }
 
     public void SetWindDirection(float windDir)
@@ -102,7 +134,73 @@ public class SeaManager : MonoBehaviour
         m_waveDescriptors = waveDescriptors;
     }
 
+    public Vector3 CalculeImage(Vector3 startPoint)
+    {
+
+        Vector3 position = startPoint;
+        foreach (Vague vague in vagues)
+        {
+            if (vague.gameObject.activeInHierarchy)
+            {
+                position += vague.CalculeVecteur(startPoint, amount);
+            }
+        }
+        //foreach (PerlinVague perlinVague in perlinVagues) {
+        //	if (perlinVague.gameObject.activeInHierarchy) {
+        //		position.y = position.y + perlinVague.CalculeHauteur(startPoint,amount);
+        //	}
+        //}
+        return position;
+    }
+
+    public void CalculeImage(Vector3 startPoint, out Vector3 imagePoint, out Vector3 normal, out Vector4 tangentX)
+    {
+        imagePoint = startPoint;
+        Vector3 slopes = new Vector3();
+        Vector3 vecteur = new Vector3();
+        Vector3 oneNormal = new Vector3();
+        Vector3 oneSlope = new Vector3();
+        foreach (Vague vague in vagues)
+        {
+            if (vague.gameObject.activeInHierarchy)
+            {
+                vague.CalculeVecteur(startPoint, out vecteur, out oneNormal, amount);
+                imagePoint += vecteur;
+                oneSlope.x = -oneNormal.x / oneNormal.y;
+                oneSlope.y = 0.0f;
+                oneSlope.z = -oneNormal.z / oneNormal.y;
+                slopes += oneSlope;
+            }
+        }
+        //TODO : calculer la normale ou la pente des perlinVagues
+        //foreach (PerlinVague perlinVague in perlinVagues) {
+        //	if (perlinVague.gameObject.activeInHierarchy) {
+        //		imagePoint.y = imagePoint.y + perlinVague.CalculeHauteur(startPoint,amount);
+        //	}
+        //}
+
+        normal.x = -slopes.x;
+        normal.y = 1.0f;
+        normal.z = -slopes.z;
+        normal.Normalize();
+
+        //tangentX.x = 1.0f;
+        //tangentX.y = slopes.z+slopes.x;
+        //tangentX.z = 1.0f;
+
+        tangentX.x = 1.0f;
+        tangentX.y = slopes.x;
+        tangentX.z = 0.0f;
+        tangentX.w = 1.0f;
+        tangentX.Normalize();
+    }
+
+    // Use this for initialization
+    Vague vague;
+
     private WaveDescriptor[] m_waveDescriptors;
+
+    private Vague[] vagues;
 
     private Material m_seaMaterial;
 }

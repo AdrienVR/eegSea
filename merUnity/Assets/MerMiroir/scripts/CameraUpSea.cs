@@ -15,49 +15,49 @@ public class CameraUpSea : MonoBehaviour {
 		// keep camera upside levelMin
 		Vector3 positionUnder = transform.position; 
 		positionUnder.y = 0f;
-		seaLevelUnder = vagues.CalculeImage(positionUnder).y;
+		seaLevelUnder = vagues.SeaManager.CalculeImage(positionUnder).y;
 		// straight
 		positionUnder = transform.position+1f*Vector3.forward; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		positionUnder = transform.position+2.5f*Vector3.forward; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		positionUnder = transform.position+10f*Vector3.forward; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		positionUnder = transform.position+20f*Vector3.forward; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		positionUnder = transform.position+30f*Vector3.forward; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		// left
 		positionUnder = transform.position+1f*Vector3.left; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		positionUnder = transform.position+2.5f*Vector3.left; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		positionUnder = transform.position+5f*Vector3.left; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		positionUnder = transform.position+10f*Vector3.left; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		// right
 		positionUnder = transform.position+1f*Vector3.right; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		positionUnder = transform.position+2.5f*Vector3.right; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		positionUnder = transform.position+5f*Vector3.right; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		positionUnder = transform.position+10f*Vector3.right; 
 		positionUnder.y = 0f;
-		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.CalculeImage (positionUnder).y);
+		seaLevelUnder = Mathf.Max (seaLevelUnder, vagues.SeaManager.CalculeImage (positionUnder).y);
 		// then ajust camera position to be up sea
 		if (transform.position.y < seaLevelUnder + levelMin) {
 			transform.Translate (0f, (seaLevelUnder + levelMin - transform.position.y), 0f, Space.World);

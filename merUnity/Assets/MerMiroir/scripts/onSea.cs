@@ -14,7 +14,7 @@ public class onSea : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		seaPos = vagues.CalculeImage (restPos);
+		seaPos = vagues.SeaManager.CalculeImage (restPos);
 		transform.position = seaPos;
 	}
 }

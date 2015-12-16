@@ -17,7 +17,7 @@ if __name__ == "__main__":
     MINQ = 0
 
     #Paramétrage du sinus (fréquence en Hz)
-    freqSin = 0.6
+    freqSin = 5
     tSin = 1.0/freqSin
     timeSin = 0.0
     sinVal = 0.0

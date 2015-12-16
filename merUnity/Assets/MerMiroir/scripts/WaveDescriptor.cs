@@ -3,9 +3,9 @@ public abstract class WaveDescriptor
 {
     public virtual float GetRadius()
     {
-        return m_radius * m_maxRadius;
+        return m_radius * MaxRadius;
     }
 
     protected float m_radius;
-    protected float m_maxRadius;
+    public float MaxRadius = 3.5f;
 }

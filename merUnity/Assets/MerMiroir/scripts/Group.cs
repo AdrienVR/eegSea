@@ -8,7 +8,7 @@ public class Group : WaveDescriptor
 {
     public string Name;
     public List<int> Electrodes;
-    private int m_FreqMin, m_FreqMax;
+    public int m_FreqMin, m_FreqMax;
     private float m_TMoyenne, m_TEcartType;
     private float m_lastValue;
 
@@ -56,7 +56,7 @@ public class Group : WaveDescriptor
 
     public override float GetRadius()
     {
-        return MathsTool.CenterValue(m_TMoyenne, m_TEcartType, 0f, 1f, m_radius, 2f);
+        return MathsTool.CenterValue(m_TMoyenne, m_TEcartType, 0f, 1f, m_radius, 2f) * MaxRadius;
     }
 
     public void setMoyenne(float m)

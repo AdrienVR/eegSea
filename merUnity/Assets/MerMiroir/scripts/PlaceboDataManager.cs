@@ -3,12 +3,22 @@ using System;
 
 public class PlaceboDataManager : SeaDataManager
 {
+    public SeaManager SeaManager;
+
     [Serializable]
     public class RandomDescriptor : WaveDescriptor
     {
         public override float GetRadius()
         {
-            return UnityEngine.Random.Range(0f, 3.5f);
+            return UnityEngine.Random.Range(0f, 1f) * MaxRadius;
+        }
+    }
+
+    void Start()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            Groups[i].MaxRadius = SeaManager.WaveParameters[i].radius;
         }
     }
 

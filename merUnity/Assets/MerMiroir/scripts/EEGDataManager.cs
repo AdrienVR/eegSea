@@ -5,9 +5,12 @@ using System.Xml;
 
 public class EEGDataManager : SeaDataManager
 {
+    public SeaManager SeaManager;
 
     public float alphaRadius; // pourcentage de la période des vagues pour temps moyen de maj des hauteurs
     public float alphaTHF; // temps moyen de maj pour le coeff du bumpmap (texture des vagues de hautes fréquences)
+
+    public float MaxRadius;
 
     public float Delta { get { return maxGD - minGD; } }
 	
@@ -296,7 +299,7 @@ public class EEGDataManager : SeaDataManager
                 Group g = new Group(name, elecsInt, int.Parse(f_min), int.Parse(f_max));
                 g.setMoyenne(TMoyenne);
                 g.setEcartType(TEcartType);
-				m_allGroups.Add(g);
+                m_allGroups.Add(g);
                 /*
 				Debug.Log ("__________________________");
 				Debug.Log ("name is "+name);
@@ -351,9 +354,10 @@ public class EEGDataManager : SeaDataManager
 						ElectrodeGroups[index] = m_allGroups[0];
 					}
 					Debug.LogError("'"+s+"' have been replaced by '"+ElectrodeGroups[index].getName()+"' for wave "+index+".");
-				}
-				index++;
-			}
+                }
+                ElectrodeGroups[index].MaxRadius = SeaManager.WaveParameters[index].radius;
+                index++;
+            }
 		}
 		for(int i=index; i < 8; i++)
 		{

@@ -7,12 +7,16 @@ public class openingSpecular : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		transform.eulerAngles=new Vector3(transform.eulerAngles.x, cam.transform.eulerAngles.y+180f,transform.eulerAngles.z);
-		targetColor = GetComponent<Light>().color;
+        m_light = GetComponent<Light>();
+        transform.eulerAngles=new Vector3(transform.eulerAngles.x, cam.transform.eulerAngles.y+180f,transform.eulerAngles.z);
+		targetColor = m_light.color;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		GetComponent<Light>().color = Mathf.Sqrt(cam.speed / cam.maxSpeed) * targetColor;
+	void Update ()
+    {
+        m_light.color = Mathf.Sqrt(cam.speed / cam.maxSpeed) * targetColor;
 	}
+
+    private Light m_light;
 }

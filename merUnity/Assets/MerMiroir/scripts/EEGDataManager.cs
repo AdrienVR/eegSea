@@ -104,15 +104,17 @@ public class EEGDataManager : SeaDataManager
         alphaTHF = Mathf.Max(0.001f, alphaTHFValue);
     }
 
-    public override bool DeltaLight()
-    {
-        return Delta > 0;
-    }
-
     public override float GetLightCoefficient(float lastCoef)
     {
+
         MoyenneGD();
         float delta = Delta;
+
+        if (delta == 0)
+        {
+            return lastCoef;
+        }
+
         float alpha = Mathf.Min(Time.deltaTime, 1f);
 
         return GetAlpha(lastCoef, alpha, delta);
@@ -165,12 +167,12 @@ public class EEGDataManager : SeaDataManager
 
     public override float GetOscillationLeft()
     {
-        return GetBetaValues()[0];
+        return ThfElectrodes[0].GetRadius();
     }
 
     public override float GetOscillationRight()
     {
-        return GetBetaValues()[1];
+        return ThfElectrodes[1].GetRadius();
     }
 
     public void MoyenneGD() //différence gauche droite
@@ -180,10 +182,10 @@ public class EEGDataManager : SeaDataManager
         float valGauche;
         float valDroite;
 
-        moyenneGauche = 0;// moyenneBasse[0] + moyenneBasse[2] + moyenneHaute[0] + moyenneHaute[2] + moyenneTheta[0] + moyenneTheta[2];
-        moyenneDroite = 0;// moyenneBasse[1] + moyenneBasse[3] + moyenneHaute[1] + moyenneHaute[3] + moyenneTheta[1] + moyenneTheta[3];
-        valGauche = 0;// basseFrequence[0] + basseFrequence[2] + hauteFrequence[0] + hauteFrequence[2] + thetaFrequence[0] + thetaFrequence[2];
-        valDroite = 0;//basseFrequence[1] + basseFrequence[3] + hauteFrequence[1] + hauteFrequence[3] + thetaFrequence[1] + thetaFrequence[3];
+        moyenneGauche = ThfElectrodes[0].GetRadius();// moyenneBasse[0] + moyenneBasse[2] + moyenneHaute[0] + moyenneHaute[2] + moyenneTheta[0] + moyenneTheta[2];
+        moyenneDroite = ThfElectrodes[1].GetRadius();// moyenneBasse[1] + moyenneBasse[3] + moyenneHaute[1] + moyenneHaute[3] + moyenneTheta[1] + moyenneTheta[3];
+        valGauche = ThfElectrodes[0].GetRadius();// basseFrequence[0] + basseFrequence[2] + hauteFrequence[0] + hauteFrequence[2] + thetaFrequence[0] + thetaFrequence[2];
+        valDroite = ThfElectrodes[2].GetRadius();//basseFrequence[1] + basseFrequence[3] + hauteFrequence[1] + hauteFrequence[3] + thetaFrequence[1] + thetaFrequence[3];
         if (moyenneGauche <= 0 || moyenneDroite <= 0 || valGauche <= 0 || valDroite <= 0)
         {
             moyenneGaucheDroite = valGaucheDroite = minMoyGD = minGD = 0f;

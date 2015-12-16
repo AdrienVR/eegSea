@@ -4,7 +4,7 @@ using System.Collections;
 
 public class WindSound : MonoBehaviour
 {
-    public SeaDataManager SeaDataManager;
+    public PlusieurVagues PlusieurVagues;
     public float av;
     public float moyMax;
 
@@ -18,7 +18,7 @@ public class WindSound : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        av = 0.9f * av + 0.1f * SeaDataManager.GetTHF(2);
+        av = 0.9f * av + 0.1f * PlusieurVagues.SeaDataManager.GetTHF(2);
         if (av > 1)
         {
             moyMax = 0.995f * moyMax + 0.005f * av;

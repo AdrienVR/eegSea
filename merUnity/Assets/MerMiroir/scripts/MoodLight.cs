@@ -3,7 +3,7 @@ using System.Collections;
 
 public class MoodLight : MonoBehaviour
 {
-    public SeaDataManager SeaDataManager;
+    public PlusieurVagues PlusieurVagues;
     public CameraOscillations cam;
     public Color leftColor = new Color(0.2f, 0.2f, 0.2f, 1f);
     public Color rightColor = new Color(0.8f, 0.8f, 0.8f, 0.8f);
@@ -21,15 +21,16 @@ public class MoodLight : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        m_coeff = SeaDataManager.GetLightCoefficient(m_coeff);
+        m_coeff = PlusieurVagues.SeaDataManager.GetLightCoefficient(m_coeff);
 
-        if (SeaDataManager.DeltaLight() == false)
+        float speed = cam.speed / cam.maxSpeed;
+
+        if (PlusieurVagues.SeaDataManager.Delta != 0)
         {
-            m_light.color = (leftColor * m_coeff + rightColor * (1f - m_coeff)) * cam.speed / cam.maxSpeed;
-            return;
+            speed = Mathf.Sqrt(speed);
         }
 
-        m_light.color = (leftColor * m_coeff + rightColor * (1f - m_coeff)) * Mathf.Sqrt(cam.speed / cam.maxSpeed);
+        m_light.color = (leftColor * m_coeff + rightColor * (1f - m_coeff)) * speed;
     }
 
     private Light m_light;

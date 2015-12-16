@@ -20,7 +20,6 @@ public class PlusieurVagues : MonoBehaviour
     float memAlphaTHF;
 
     //PerlinVague[] perlinVagues;
-    public GameObject targetGameObject;
 
     public int numberOfWavesToUse = 8;
 
@@ -80,17 +79,14 @@ public class PlusieurVagues : MonoBehaviour
     {
         for (int i = 0; i < 4; i++)
         {
-            //tabTHF[i];
-        }
-
-        for (int i = 0; i < 4; i++)
-        {
             if (i < 3)
             {
                 moyenneTHF[i] = EstimationMoyenne(Time.deltaTime / SeaDataManager.TMoyenne, moyenneTHF[i], tabTHF[i]);
                 ecartTypeTHF[i] = EstimationEcartType(Time.deltaTime / SeaDataManager.TEcartType, ecartTypeTHF[i], moyenneTHF[i], tabTHF[i]);
             }
         }
+
+        CalculTHF();
     }
 
     //estimation de l'écart type à l'instant t en tenant compte de l'écart type précédent
@@ -132,7 +128,7 @@ public class PlusieurVagues : MonoBehaviour
         return ((1f - alpha) * moyenne + alpha * lastValue);
     }
 
-    public void CalculTHF(float maxTHF)
+    public void CalculTHF()
     {
         //Calcule les différentes valeurs que prendront les coefs correspondant aux très hautes fréquences (coef modifiant la texture pour donner l'impression de vagues de surface)
         THF1[0] = Mathf.Exp(MathsTool.CenterValue(moyenneTHF[0], ecartTypeTHF[0], Mathf.Log(0.1f), Mathf.Log(maxTHF), tabTHF[0], 1f));

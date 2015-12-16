@@ -10,7 +10,6 @@ public class ClientBehavior : MonoBehaviour
 {
 
     public EEGDataManager EEGDataManager;
-    public bool first;
 
     // Singleton
     public static ClientBehavior Instance;
@@ -97,17 +96,17 @@ public class ClientBehavior : MonoBehaviour
             {
 
                 string[] sensorStrings = debuf[j].Split(new char[] { ';' }); ;
-                first = true;
+                m_first = true;
                 //Debug.Log("Nb electrodes dans le paquet : " + sensorStrings.Length.ToString());
                 for (int i = 0; i < sensorStrings.Length - 1; i++)
                 {
                     //Debug.Log("Electrode " + i.ToString());
                     //Information de temps en premiÃ¨re position
-                    if (first)
+                    if (m_first)
                     {
                         sensorTime = float.Parse(sensorStrings[0], CultureInfo.InvariantCulture.NumberFormat);
                         //Debug.Log("Lecture du temps : " + sensorTime.ToString());
-                        first = false;
+                        m_first = false;
                     }
                     //Noms et valeurs de capteurs ensuite
                     else
@@ -144,6 +143,8 @@ public class ClientBehavior : MonoBehaviour
             ReceiveData();
         }
     }
+
+    private bool m_first;
 
     private bool m_threadEnabled = false;
 
